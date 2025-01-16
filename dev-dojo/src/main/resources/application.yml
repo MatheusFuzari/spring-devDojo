@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: anime-service
+server:
+  port: 8090
+  
