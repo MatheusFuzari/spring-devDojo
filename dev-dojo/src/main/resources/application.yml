@@ -1,6 +1,16 @@
 spring:
   application:
     name: anime-service
+  threads:
+    virtual:
+      enabled: true
+
 server:
   port: 8090
-  
+  servlet:
+    context-path: /
+  error:
+    include-stacktrace: never
+  tomcat:
+    threads:
+      max: 20
