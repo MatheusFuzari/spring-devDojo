@@ -10,7 +10,7 @@ server:
   servlet:
     context-path: /
   error:
-    include-stacktrace: never
+    include-stacktrace: on_param
   tomcat:
     threads:
       max: 20

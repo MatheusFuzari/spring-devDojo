@@ -1,25 +1,39 @@
 package com.example.dev_dojo.controller;
 
 
+import com.example.dev_dojo.domain.Anime;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
-@RequestMapping("v1")
+@RequestMapping("v1/animes")
 @Slf4j
 public class AnimeController {
 
-    @GetMapping("/animes")
+    @GetMapping()
+    public List<Anime> animesList(@RequestParam(required = false) String name) {
+        var animes = Anime.getAnimes();
+        if(name == null) return animes;
 
-    public List<String> animesList() {
-        log.info(Thread.currentThread().getName());
-        return List.of("A", "B", "C", "D", "E", "F", "G");
+        return animes.stream().filter(a -> a.getAnime().equalsIgnoreCase(name)).toList();
+
+    }
+
+    @GetMapping("{id}")
+    public Anime animeById(@PathVariable Long id){
+        return Anime.getAnimes().stream().filter(a -> a.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    @PostMapping()
+    public Anime createAnime(@RequestBody Anime anime) {
+        anime.setId(ThreadLocalRandom.current().nextLong(100_000));
+        Anime.getAnimes().add(anime);
+        return anime;
     }
 }
