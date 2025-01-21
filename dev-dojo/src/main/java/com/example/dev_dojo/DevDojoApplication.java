@@ -12,8 +12,7 @@ import java.util.Arrays;
 public class DevDojoApplication {
 
 	public static void main(String[] args) {
-		var applicationContext = SpringApplication.run(DevDojoApplication.class, args);
-		Arrays.stream(applicationContext.getBeanDefinitionNames()).forEach(System.out::println);
+		SpringApplication.run(DevDojoApplication.class, args);
 	}
 
 }

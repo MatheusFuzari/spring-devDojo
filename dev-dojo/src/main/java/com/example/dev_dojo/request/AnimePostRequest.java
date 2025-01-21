@@ -5,7 +5,6 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class ProducerPostRequest {
-    private Long id;
-    private String name;
+public class AnimePostRequest {
+    private String anime;
 }
