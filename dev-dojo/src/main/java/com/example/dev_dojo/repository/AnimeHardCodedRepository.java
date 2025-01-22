@@ -2,12 +2,14 @@ package com.example.dev_dojo.repository;
 
 import com.example.dev_dojo.domain.Anime;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class AnimeHardCodedRepository {
     public static final List<Anime> ANIMES = new ArrayList<>();
 

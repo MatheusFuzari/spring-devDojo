@@ -6,6 +6,7 @@ import com.example.dev_dojo.request.ProducerPutRequest;
 import com.example.dev_dojo.response.ProducerGetResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.List;
 
 // Tenta fazer o mapeamento de um objeto (source) para outro (target).
 
-@Mapper
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProducerMapper {
 
     ProducerMapper INSTANCE = Mappers.getMapper(ProducerMapper.class);

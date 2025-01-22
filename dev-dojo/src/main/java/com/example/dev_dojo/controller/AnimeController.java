@@ -8,6 +8,7 @@ import com.example.dev_dojo.request.AnimePostRequest;
 import com.example.dev_dojo.request.AnimePutRequest;
 import com.example.dev_dojo.response.AnimeGetResponse;
 import com.example.dev_dojo.service.AnimeService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,15 +24,12 @@ import java.util.concurrent.ThreadLocalRandom;
 @RestController
 @RequestMapping("v1/animes")
 @Slf4j
+@RequiredArgsConstructor
 public class AnimeController {
 
-    private static final AnimeMapper MAPPER = AnimeMapper.MAPPER;
+    private final AnimeMapper MAPPER;
 
-    private AnimeService service;
-
-    public AnimeController() {
-        this.service = new AnimeService();
-    }
+    private final AnimeService service;
 
     @GetMapping()
     public ResponseEntity<List<AnimeGetResponse>> animesList(@RequestParam(required = false) String name) {

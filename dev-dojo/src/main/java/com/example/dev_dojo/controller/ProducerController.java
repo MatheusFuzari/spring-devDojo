@@ -31,9 +31,11 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequiredArgsConstructor
 public class ProducerController {
 
-    private static final ProducerMapper MAPPER = ProducerMapper.INSTANCE;
+    private final ProducerMapper MAPPER;
 
     private final ProducerService producerService;
+
+
 
     /*
     * Pq passar o Autowired no construtor, não na variavel?
