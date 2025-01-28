@@ -17,10 +17,6 @@ public class ProducerHardCodedRepository {
 
     private final ProducerData producerData;
 
-    @Qualifier(value = "connectionMongo")
-    private final Connection connection;
-
-
     public List<Producer> findAll() {
         return producerData.getProducers();
     }

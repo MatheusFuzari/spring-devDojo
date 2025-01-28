@@ -42,28 +42,28 @@ class AnimeServiceTest {
     @Order(1)
     void findAll_ReturnAllAnimes_WhenNameIsNull(){
         BDDMockito.when(repository.findAll()).thenReturn(animeList);
-        var animes = service.findAll("Berserk");
+        var animes = service.findAll(null);
 
         org.assertj.core.api.Assertions.assertThat(animes).isNotEmpty().hasSameElementsAs(animeList);
     }
 
 
     @Test
-    @DisplayName("findAll should return empty list when name is not null")
+    @DisplayName("findAll should return empty list when name is not fond")
     @Order(2)
     void findByName_ReturnEmptyList_WhenNameIsNull(){
-        BDDMockito.when(repository.findAll()).thenReturn(List.of());
-        var animes = service.findAll(null);
+        BDDMockito.when(repository.findByName("Shingeki")).thenReturn(List.of());
+        var animes = service.findAll("Shingeki");
 
         org.assertj.core.api.Assertions.assertThat(animes).isEmpty();
     }
 
     @Test
-    @DisplayName("findName should return a empty list when name is null")
+    @DisplayName("findName should return an anime in a list when name is found")
     @Order(3)
     void findByName_ReturnAnime_WhenNameIsFound(){
         var animeFound = animeList.getFirst();
-        BDDMockito.when(repository.findByName(animeFound.getAnime())).thenReturn(animeList);
+        BDDMockito.when(repository.findByName(animeFound.getAnime())).thenReturn(List.of(animeFound));
 
         var anime = service.findAll(animeFound.getAnime());
 
@@ -107,13 +107,49 @@ class AnimeServiceTest {
     }
 
     @Test
-    @DisplayName("delete removes an anime")
+    @DisplayName("delete removes an anime when anime exists")
     @Order(7)
     void delete_RemovesAnime_WhenSuccessful(){
         var animeToDelete = animeList.getFirst();
-        BDDMockito.when(repository.save(animeToDelete)).thenReturn(newAnime);
+        BDDMockito.when(repository.findById(animeToDelete.getId())).thenReturn(Optional.of(animeToDelete));
+        BDDMockito.doNothing().when(repository).delete(animeToDelete);
 
+        org.assertj.core.api.Assertions.assertThatNoException().isThrownBy(() -> service.delete(animeToDelete.getId()));
+    }
 
-        org.assertj.core.api.Assertions.assertThatNoException().isThrownBy(() -> repository.delete(animeToDelete));
+    @Test
+    @DisplayName("delete throws ResponseStatusException when anime is not found")
+    @Order(8)
+    void delete_ThrowsResponseStatusException_WhenAnimeIsNotFound(){
+        var animeToDelete = animeList.getFirst();
+        BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
+
+        org.assertj.core.api.Assertions.assertThatException()
+                .isThrownBy(() -> service.delete(animeToDelete.getId()))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+    @DisplayName("update updates an anime")
+    @Order(9)
+    void update_UpdateAnime_WhenSuccessful(){
+        var animeToUpdate = animeList.getFirst();
+        animeToUpdate.setAnime("Jujutsu Kaisen");
+        BDDMockito.when(repository.findById(animeToUpdate.getId())).thenReturn(Optional.of(animeToUpdate));
+        BDDMockito.doNothing().when(repository).update(animeToUpdate);
+
+        org.assertj.core.api.Assertions.assertThatNoException().isThrownBy(() -> service.update(animeToUpdate));
+    }
+
+    @Test
+    @DisplayName("update throws ResponseStatusException when anime in not found")
+    @Order(10)
+    void update_ThrowsResponseStatusException_WhenAnimeIsNotFound(){
+        var animeToUpdate = animeList.getFirst();
+        BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.empty());
+
+        org.assertj.core.api.Assertions.assertThatException()
+                .isThrownBy(() -> service.update(animeToUpdate))
+                .isInstanceOf(ResponseStatusException.class);
     }
 }
