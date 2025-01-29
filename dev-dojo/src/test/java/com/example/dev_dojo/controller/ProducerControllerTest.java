@@ -15,7 +15,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -42,6 +44,8 @@ class ProducerControllerTest {
     private MockMvc mockMvc;
     @MockitoBean
     private ProducerData producerData;
+    @MockitoSpyBean
+    private ProducerHardCodedRepository repository;
     private final List<Producer> producers = new ArrayList<>();
 
     @Autowired
@@ -127,9 +131,24 @@ class ProducerControllerTest {
     @Test
     @DisplayName("POST v1/producers creates a producer")
     @Order(6)
-    void save_CreatesProducer_WhenSuccessful() {
-        var newProducer = Producer.builder().id(5L).name("Ufutable").createdAt(LocalDateTime.now()).build();
-        BDDMockito.when(producerData.getProducers()).thenReturn(producers);
+    void save_CreatesProducer_WhenSuccessful()  throws Exception{
+        var request = readResourceFile("producer/post-request-producer-200.json");
+        var response = readResourceFile("producer/post-response-producer-201.json");
+
+        var producerToSave = Producer.builder().id(99L).name("Mappa").createdAt(LocalDateTime.now()).build();
+
+        BDDMockito.when(repository.save(ArgumentMatchers.any())).thenReturn(producerToSave);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/producers")
+                        .content(request)
+                        .header("x-api-kei", "123")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
     private String readResourceFile(String filename) throws IOException {
