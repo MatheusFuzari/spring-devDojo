@@ -1,5 +1,6 @@
 package com.example.dev_dojo.service;
 
+import com.example.dev_dojo.commons.AnimeUtils;
 import com.example.dev_dojo.domain.Anime;
 import com.example.dev_dojo.repository.AnimeHardCodedRepository;
 import org.junit.jupiter.api.*;
@@ -27,14 +28,12 @@ class AnimeServiceTest {
     @Mock
     private AnimeHardCodedRepository repository;
     private List<Anime> animeList;
+    @InjectMocks
+    private AnimeUtils animeUtils;
 
     @BeforeEach
     void init(){
-        this.animeList = new ArrayList<>(List.of(
-                Anime.builder().id(1L).anime("Berserk").build(),
-                Anime.builder().id(2L).anime("Jujutsu Kaisen").build(),
-                Anime.builder().id(3L).anime("Soul Eater").build(),
-                Anime.builder().id(4L).anime("Bleach").build()));
+        this.animeList = animeUtils.newAnimeList();
     }
 
     @Test
@@ -98,7 +97,7 @@ class AnimeServiceTest {
     @DisplayName("save creates an anime")
     @Order(6)
     void save_CreateAnime_WhenSuccessful(){
-        var newAnime = Anime.builder().id(99L).anime("Kimetsu no Yaiba").build();
+        var newAnime = animeUtils.newAnimeToSave();
         BDDMockito.when(repository.save(newAnime)).thenReturn(newAnime);
 
         var anime = repository.save(newAnime);

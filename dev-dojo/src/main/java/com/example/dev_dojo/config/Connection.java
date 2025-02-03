@@ -1,4 +1,4 @@
-package external.dependency;
+package com.example.dev_dojo.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

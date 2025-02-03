@@ -1,5 +1,6 @@
 package com.example.dev_dojo.repository;
 
+import com.example.dev_dojo.commons.ProducerUtils;
 import com.example.dev_dojo.domain.Producer;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -22,17 +23,17 @@ class ProducerHardCodedRepositoryTest {
     //Classe alvo
     @InjectMocks
     private ProducerHardCodedRepository repository;
-
     //Caso encontre uma classe desse tipo, instânciar
     @Mock
     private ProducerData producerData;
-
-    private final List<Producer> producers = new ArrayList<>();
+    private List<Producer> producers = new ArrayList<>();
+    @InjectMocks
+    private ProducerUtils producerUtils;
 
     //Será executado antes de cada metodo.
     @BeforeEach
     void init() {
-        producers.addAll(List.of(Producer.builder().id(1L).name("Mappa").createdAt(LocalDateTime.now()).build(), Producer.builder().id(2L).name("Kyoto Animation").createdAt(LocalDateTime.now()).build(), Producer.builder().id(3L).name("Madhouse").createdAt(LocalDateTime.now()).build(), Producer.builder().id(4L).name("Ghibli Studios").createdAt(LocalDateTime.now()).build()));
+        this.producers = producerUtils.newProducerList();
 
         //Quando o metodo getProducers() for chaamdo, utilizar esta variável
         BDDMockito.when(producerData.getProducers()).thenReturn(producers);
@@ -87,7 +88,7 @@ class ProducerHardCodedRepositoryTest {
     @DisplayName("save creates a producer")
     @Order(5)
     void save_CreatesProducer_WhenSuccessful() {
-        var newProducer = Producer.builder().id(5L).name("Ufutable").createdAt(LocalDateTime.now()).build();
+        var newProducer = producerUtils.newProducerToSave();
         var producer = repository.save(newProducer);
 
         Assertions.assertThat(producer).isEqualTo(newProducer).hasNoNullFieldsOrProperties();

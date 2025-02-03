@@ -1,11 +1,13 @@
 package com.example.dev_dojo.service;
 
+import com.example.dev_dojo.commons.ProducerUtils;
 import com.example.dev_dojo.domain.Producer;
 import com.example.dev_dojo.repository.ProducerHardCodedRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -19,17 +21,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ProducerServiceTest {
-
     @InjectMocks
     private ProducerService service;
-
     @Mock
     private ProducerHardCodedRepository repository;
     private List<Producer> producerList;
+    @InjectMocks
+    private ProducerUtils producerUtils;
 
     @BeforeEach
     void init() {
-        this.producerList = new ArrayList<>(List.of(Producer.builder().id(1L).name("Mappa").createdAt(LocalDateTime.now()).build(), Producer.builder().id(2L).name("Kyoto Animation").createdAt(LocalDateTime.now()).build(), Producer.builder().id(3L).name("Madhouse").createdAt(LocalDateTime.now()).build(), Producer.builder().id(4L).name("Ghibli Studios").createdAt(LocalDateTime.now()).build()));
+        this.producerList = producerUtils.newProducerList();
 
     }
 
@@ -108,7 +110,7 @@ class ProducerServiceTest {
     @DisplayName("save creates a producer")
     @Order(6)
     void save_CreatesProducer_WhenSuccessful() {
-        var newProducer = Producer.builder().id(5L).name("Ufutable").createdAt(LocalDateTime.now()).build();
+        var newProducer = producerUtils.newProducerToSave();
         BDDMockito.when(repository.save(newProducer)).thenReturn(newProducer);
 
         var producer = service.save(newProducer);
