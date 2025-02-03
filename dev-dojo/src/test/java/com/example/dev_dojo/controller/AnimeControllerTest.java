@@ -115,7 +115,6 @@ class AnimeControllerTest {
     void findById_ReturnResponseStatusException_WhenIdIsNotFound() throws Exception{
         BDDMockito.when(animeData.getAnimes()).thenReturn(animeList);
 
-        var response = readResourceFile("/animes/get-anime-by-id-200.json");
         var id = 99L;
 
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/animes/{id}", id))
@@ -178,7 +177,28 @@ class AnimeControllerTest {
     @Test
     @DisplayName("DELETE v1/animes/1 delete removes an anime when anime exists")
     @Order(9)
-    void delete_RemovesAnime_WhenSuccessful(){
+    void delete_RemovesAnime_WhenSuccessful() throws Exception{
+        var id = 1L;
+
+        BDDMockito.when(animeData.getAnimes()).thenReturn(animeList);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/animes/{id}", id))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("DELETE v1/animes/99 throws ResponseStatusException when anime is not found")
+    @Order(10)
+    void delete_ThrowsResponseStatusException_WhenAnimeIsNotFound() throws Exception{
+        var id = 99L;
+
+        BDDMockito.when(animeData.getAnimes()).thenReturn(animeList);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/animes/{id}", id))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason("Anime Not Found"));
     }
 
     private String readResourceFile(String filename) throws IOException {
