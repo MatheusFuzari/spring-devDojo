@@ -9,6 +9,7 @@
 
 	<modules>
 		<module>dev-dojo</module>
+		<module>users-microservice</module>
 	</modules>
 
 </project>

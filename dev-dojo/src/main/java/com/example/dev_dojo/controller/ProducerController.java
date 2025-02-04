@@ -75,6 +75,8 @@ public class ProducerController {
     headers = "x-api-key")
     public ResponseEntity<ProducerGetResponse> createProducer(@RequestBody ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
 
+        log.debug("Requesto to POST producer"+ producerPostRequest);
+
         Producer producer = MAPPER.toProducer(producerPostRequest);
 
         producerService.save(producer);

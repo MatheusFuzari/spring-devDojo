@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: users-microservice
+
+server:
+  port: 8060
+  servlet:
+    context-path: /
+  error:
+    include-stacktrace: on_param

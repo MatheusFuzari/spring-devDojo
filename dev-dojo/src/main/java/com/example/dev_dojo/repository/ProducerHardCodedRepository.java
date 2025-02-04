@@ -1,23 +1,24 @@
 package com.example.dev_dojo.repository;
 
 import com.example.dev_dojo.domain.Producer;
-import external.dependecy.Connection;
+import com.example.dev_dojo.config.Connection;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class ProducerHardCodedRepository {
 
     private final ProducerData producerData;
-
+    private final Connection connection;
     public List<Producer> findAll() {
+        log.info("Connection: "+connection);
+
         return producerData.getProducers();
     }
 
