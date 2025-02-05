@@ -7,6 +7,9 @@ import com.example.users_microservice.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
@@ -25,8 +28,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @WebMvcTest(controllers = UserController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -141,12 +146,13 @@ class UserControllerTest {
         var request = readResourceFile("/users/post-request-users-200.json");
         var response = readResourceFile("/users/post-response-users-201.json");
 
-        BDDMockito.when(service.save(userToSave)).thenReturn(userToSave);
+        BDDMockito.when(service.save(ArgumentMatchers.any())).thenReturn(userToSave);
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL)
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().json(response));
     }
@@ -212,9 +218,81 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().reason("User Not Found"));
     }
 
+    @ParameterizedTest
+    @MethodSource("postUserBadRequestSource")
+    @Order(11)
+    @DisplayName("POST /v1/users return bad request when fields are empty")
+    void save_ReturnBadRequest_WhenFieldsEmpty(String filename, List<String> errors) throws Exception{
+        var request = readResourceFile("/users/%s".formatted(filename));
+
+        var mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(URL)
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        var responseError = mvcResult.getResolvedException();
+
+        Assertions.assertThat(responseError).isNotNull();
+
+        Assertions.assertThat(responseError.getMessage())
+                .contains(errors);
+    }
+
+    @ParameterizedTest
+    @MethodSource("")
+    @Order(12)
+    @DisplayName("PUT /v1/users returns bad request when field are empty")
+    void update_ReturnBadRequest_WhenFieldsEmpty(String filename, List<String> errors) throws Exception{
+        var userToUpdate = userList.getFirst();
+
+        var request = readResourceFile("/users/put-request-users-200.json");
+
+        BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
+
+        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(request))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
 
     public String readResourceFile(String filename) throws IOException {
         var file = resourceLoader.getResource("classpath:%s" .formatted(filename)).getFile();
         return new String(Files.readAllBytes(file.toPath()));
+    }
+
+    private static Stream<Arguments> postUserBadRequestSource() {
+        var firstNameError = "The field 'firstName' is required";
+        var lastNameError = "The field 'lastName' is required";
+        var emailRequiredError = "The field 'email' is required";
+        var emailInvalidError = "'email' is not valid";
+
+        var allErrors = List.of(firstNameError, lastNameError, emailRequiredError);
+        var emailErrors = Collections.singletonList(emailInvalidError);
+
+        return Stream.of(
+            Arguments.of("post-request-users-empty-fields-400.json", allErrors),
+            Arguments.of("post-request-users-blank-fields-400.json", allErrors),
+            Arguments.of("post-request-users-invalid-email-400.json", emailErrors)
+        );
+    }
+
+    private static Stream<Arguments> putUserBadRequestSource() {
+        var firstNameError = "The field 'firstName' is required";
+        var lastNameError = "The field 'lastName' is required";
+        var emailRequiredError = "The field 'email' is required";
+        var emailInvalidError = "'email' is not valid";
+
+        var allErrors = List.of(firstNameError, lastNameError, emailRequiredError);
+        var emailErrors = Collections.singletonList(emailInvalidError);
+
+        return Stream.of(
+                Arguments.of("post-request-users-empty-fields-400.json", allErrors),
+                Arguments.of("post-request-users-blank-fields-400.json", allErrors),
+                Arguments.of("post-request-users-invalid-email-400.json", emailErrors)
+        );
     }
 }

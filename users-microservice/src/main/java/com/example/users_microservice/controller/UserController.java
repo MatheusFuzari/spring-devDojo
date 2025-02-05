@@ -6,6 +6,7 @@ import com.example.users_microservice.dto.request.PutUserRequestDTO;
 import com.example.users_microservice.dto.response.GetUserResponseDTO;
 import com.example.users_microservice.mapper.UserMapper;
 import com.example.users_microservice.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,14 +36,14 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody PostUserRequestDTO request){
+    public ResponseEntity<User> createUser(@RequestBody @Valid PostUserRequestDTO request){
         var userToSave = MAPPER.toUser(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(userToSave));
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateUser(@RequestBody PutUserRequestDTO request){
+    public ResponseEntity<Void> updateUser(@RequestBody @Valid PutUserRequestDTO request){
         log.info("PUT request: {}", request);
 
         var userToUpdate = MAPPER.toUser(request);
