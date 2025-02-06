@@ -9,6 +9,7 @@ import com.example.dev_dojo.request.ProducerPostRequest;
 import com.example.dev_dojo.request.ProducerPutRequest;
 import com.example.dev_dojo.response.ProducerGetResponse;
 import com.example.dev_dojo.service.ProducerService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,10 +71,10 @@ public class ProducerController {
 
     // Produces -> O que este endpoint está gerando? (Content-Type)
     // Consumes -> O que este endpoint consome? (Content-type dos Headers)
-    // Headers -> Adiciona os headers necessários para a requisição, na Annotation é obrigatório, no argumento seleciona todos os headers enviados.
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE,
-    headers = "x-api-key")
-    public ResponseEntity<ProducerGetResponse> createProducer(@RequestBody ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
+    // Headers  -> Adiciona os headers necessários para a requisição, na Annotation é obrigatório, no argumento seleciona todos os headers enviados.
+    //produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "x-api-key"
+    @PostMapping()
+    public ResponseEntity<ProducerGetResponse> createProducer(@RequestBody @Valid ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
 
         log.debug("Requesto to POST producer"+ producerPostRequest);
 
@@ -95,7 +96,7 @@ public class ProducerController {
     }
 
     @PutMapping()
-    public ResponseEntity<Void> updateProducer(@RequestBody ProducerPutRequest putRequest) {
+    public ResponseEntity<Void> updateProducer(@RequestBody @Valid ProducerPutRequest putRequest) {
         log.debug("Update producer {}", putRequest);
 
         var producerUpdated = MAPPER.toProducer(putRequest);

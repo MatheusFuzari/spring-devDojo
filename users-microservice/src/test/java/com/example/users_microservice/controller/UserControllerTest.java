@@ -28,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -241,21 +242,25 @@ class UserControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("")
+    @MethodSource("putUserBadRequestSource")
     @Order(12)
     @DisplayName("PUT /v1/users returns bad request when field are empty")
     void update_ReturnBadRequest_WhenFieldsEmpty(String filename, List<String> errors) throws Exception{
-        var userToUpdate = userList.getFirst();
 
-        var request = readResourceFile("/users/put-request-users-200.json");
+        var request = readResourceFile("/users/%s".formatted(filename));
 
-        BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
-
-        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+        var mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URL)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(request))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        var responseError = mvcResult.getResolvedException();
+
+        Assertions.assertThat(responseError).isNotNull();
+
+        Assertions.assertThat(responseError.getMessage()).contains(errors);
     }
 
 
@@ -265,13 +270,8 @@ class UserControllerTest {
     }
 
     private static Stream<Arguments> postUserBadRequestSource() {
-        var firstNameError = "The field 'firstName' is required";
-        var lastNameError = "The field 'lastName' is required";
-        var emailRequiredError = "The field 'email' is required";
-        var emailInvalidError = "'email' is not valid";
-
-        var allErrors = List.of(firstNameError, lastNameError, emailRequiredError);
-        var emailErrors = Collections.singletonList(emailInvalidError);
+        var allErrors = allRequiredErrors();
+        var emailErrors = invalidEmail();
 
         return Stream.of(
             Arguments.of("post-request-users-empty-fields-400.json", allErrors),
@@ -281,18 +281,29 @@ class UserControllerTest {
     }
 
     private static Stream<Arguments> putUserBadRequestSource() {
+        var idNullError = "The field 'id' cannot be null";
+        var allErrors = allRequiredErrors();
+        var emailErrors = invalidEmail();
+        var idErrors = Collections.singletonList(idNullError);
+
+        allErrors.add(idNullError);
+        return Stream.of(
+                Arguments.of("put-request-users-empty-fields-400.json", allErrors),
+                Arguments.of("put-request-users-blank-fields-400.json", allErrors),
+                Arguments.of("put-request-users-invalid-email-400.json", emailErrors),
+                Arguments.of("put-request-users-null-id-400.json", idErrors)
+        );
+    }
+
+    public static List<String> invalidEmail(){
+        var emailInvalidError = "'email' is not valid";
+        return Collections.singletonList(emailInvalidError);
+    }
+
+    public static List<String> allRequiredErrors(){
         var firstNameError = "The field 'firstName' is required";
         var lastNameError = "The field 'lastName' is required";
         var emailRequiredError = "The field 'email' is required";
-        var emailInvalidError = "'email' is not valid";
-
-        var allErrors = List.of(firstNameError, lastNameError, emailRequiredError);
-        var emailErrors = Collections.singletonList(emailInvalidError);
-
-        return Stream.of(
-                Arguments.of("post-request-users-empty-fields-400.json", allErrors),
-                Arguments.of("post-request-users-blank-fields-400.json", allErrors),
-                Arguments.of("post-request-users-invalid-email-400.json", emailErrors)
-        );
+        return new ArrayList<>(List.of(firstNameError, lastNameError, emailRequiredError));
     }
 }
