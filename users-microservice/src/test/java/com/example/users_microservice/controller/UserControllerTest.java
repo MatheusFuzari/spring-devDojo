@@ -132,10 +132,12 @@ class UserControllerTest {
         var id = 99L;
         BDDMockito.when(userData.getUsers()).thenReturn(userList);
 
+        var response = readResourceFile("/users/get-users-by-id-404.json");
+
         mockMvc.perform(MockMvcRequestBuilders.get(URL+"/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("User Not Found"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
     @Test
@@ -180,10 +182,12 @@ class UserControllerTest {
 
         BDDMockito.when(userData.getUsers()).thenReturn(userList);
 
+        var response = readResourceFile("/users/get-users-by-id-404.json");
+
         mockMvc.perform(MockMvcRequestBuilders.delete(URL+"/{id}",id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("User Not Found"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
     @Test
@@ -210,13 +214,14 @@ class UserControllerTest {
         var userToUpdate = userList.getFirst();
 
         var request = readResourceFile("/users/put-request-users-404.json");
+        var response = readResourceFile("/users/get-users-by-id-404.json");
 
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(request))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("User Not Found"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
     @ParameterizedTest

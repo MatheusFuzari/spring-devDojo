@@ -2,11 +2,9 @@ package com.example.dev_dojo.service;
 
 import com.example.dev_dojo.domain.Producer;
 import com.example.dev_dojo.repository.ProducerHardCodedRepository;
+import com.exemple.dev_dojo.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,7 +20,7 @@ public class ProducerService {
 
     public Producer findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producer Not Found"));
+                .orElseThrow(() -> new NotFoundException("Producer Not Found"));
     }
 
     public Producer save(Producer producer) {

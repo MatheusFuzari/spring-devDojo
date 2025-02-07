@@ -5,6 +5,7 @@ import com.example.dev_dojo.commons.ProducerUtils;
 import com.example.dev_dojo.domain.Producer;
 import com.example.dev_dojo.repository.ProducerData;
 import com.example.dev_dojo.repository.ProducerHardCodedRepository;
+import com.example.dev_dojo.service.ProducerService;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -50,6 +51,8 @@ class ProducerControllerTest {
     private ProducerData producerData;
     @MockitoSpyBean
     private ProducerHardCodedRepository repository;
+    @MockitoSpyBean
+    private ProducerService service;
     private List<Producer> producers = new ArrayList<>();
     @Autowired
     private FileUtils fileUtils;
@@ -117,16 +120,18 @@ class ProducerControllerTest {
     }
 
     @Test
-    @DisplayName("GET v1/producers/id throws producer not found")
+    @DisplayName("GET v1/producers/id throws producer not found when producer is not found")
     @Order(5)
-    void findById_ThrowsResponseStatusException_WhenProducerIsNotFound() throws Exception{
+    void findById_ThrowsNotFound_WhenProducerIsNotFound() throws Exception{
         BDDMockito.when(producerData.getProducers()).thenReturn(producers);
         Long id = 99L;
+
+        var response = fileUtils.readResourceFile("/producer/get-producer-by-id-404.json");
 
         mockMvc.perform(MockMvcRequestBuilders.get(URL+"/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer Not Found"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
 
@@ -142,7 +147,7 @@ class ProducerControllerTest {
 
         log.debug("Producer to save: " + producerToSave);
 
-        BDDMockito.when(repository.save(ArgumentMatchers.any())).thenReturn(producerToSave);
+        BDDMockito.when(service.save(ArgumentMatchers.any())).thenReturn(producerToSave);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(URL)
@@ -174,11 +179,13 @@ class ProducerControllerTest {
     }
 
     @Test
-    @DisplayName("PUT v1/producers update throws a ResponseStatusException when producer is not found")
+    @DisplayName("PUT v1/producers update throws not found when producer is not found")
     @Order(8)
-    void update_ThrowsResponseStatusException_WhenProducerIsNotFound() throws Exception{
+    void update_ThrowsNotFound_WhenProducerIsNotFound() throws Exception{
         BDDMockito.when(producerData.getProducers()).thenReturn(producers);
+
         var request = fileUtils.readResourceFile("producer/put-request-producer-404.json");
+        var response = fileUtils.readResourceFile("/producer/get-producer-by-id-404.json");
 
         mockMvc.perform(MockMvcRequestBuilders
                 .put(URL)
@@ -187,7 +194,7 @@ class ProducerControllerTest {
             )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer Not Found"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
 
     }
 
@@ -203,14 +210,17 @@ class ProducerControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE v1/producers/{id} delete throws a ResponseStatusException when userId is Not Found")
+    @DisplayName("DELETE v1/producers/{id} delete throws Not Found when userId is Not Found")
     @Order(10)
-    void delete_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception{
+    void delete_ThrowsNotFound_WhenIdIsNotFound() throws Exception{
         var id = 99L;
+
+        var response = fileUtils.readResourceFile("/producer/get-producer-by-id-404.json");
 
         mockMvc.perform(MockMvcRequestBuilders.delete(URL+"/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
     @ParameterizedTest

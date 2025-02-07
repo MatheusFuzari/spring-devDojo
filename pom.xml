@@ -8,6 +8,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>commons-core</module>
 		<module>dev-dojo</module>
 		<module>users-microservice</module>
 	</modules>

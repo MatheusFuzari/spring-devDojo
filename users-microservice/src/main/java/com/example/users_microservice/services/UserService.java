@@ -2,6 +2,7 @@ package com.example.users_microservice.services;
 
 import com.example.users_microservice.domain.User;
 import com.example.users_microservice.repository.UserHardCodedRepository;
+import com.exemple.dev_dojo.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class UserService {
 
     public User findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
+                .orElseThrow(() -> new NotFoundException("User Not Found"));
     }
 
     public User save(User user){

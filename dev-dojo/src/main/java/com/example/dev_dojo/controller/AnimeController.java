@@ -1,8 +1,6 @@
 package com.example.dev_dojo.controller;
 
 
-import com.example.dev_dojo.domain.Anime;
-import com.example.dev_dojo.domain.Producer;
 import com.example.dev_dojo.mapper.AnimeMapper;
 import com.example.dev_dojo.request.AnimePostRequest;
 import com.example.dev_dojo.request.AnimePutRequest;
@@ -14,13 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("v1/animes")
@@ -78,6 +71,8 @@ public class AnimeController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+
 }
 
 

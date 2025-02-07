@@ -1,30 +1,21 @@
 package com.example.dev_dojo.controller;
 
 
-import com.example.dev_dojo.domain.Anime;
 import com.example.dev_dojo.domain.Producer;
 import com.example.dev_dojo.mapper.ProducerMapper;
-import com.example.dev_dojo.request.AnimePutRequest;
 import com.example.dev_dojo.request.ProducerPostRequest;
 import com.example.dev_dojo.request.ProducerPutRequest;
 import com.example.dev_dojo.response.ProducerGetResponse;
 import com.example.dev_dojo.service.ProducerService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("v1/producers")
