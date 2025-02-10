@@ -1,9 +1,7 @@
 package com.example.users_microservice.controller;
 
 import com.example.users_microservice.domain.User;
-import com.example.users_microservice.repository.UserData;
-import com.example.users_microservice.repository.UserHardCodedRepository;
-import com.example.users_microservice.services.UserService;
+import com.example.users_microservice.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -12,14 +10,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -43,15 +39,9 @@ class UserControllerTest {
 
     @Autowired
     MockMvc mockMvc;
-
     @MockitoBean
-    UserData userData;
+    UserRepository repository;
 
-    @MockitoSpyBean
-    UserService service;
-
-    @MockitoSpyBean
-    UserHardCodedRepository repository;
     @Autowired
     private ResourceLoader resourceLoader;
     private List<User> userList;
@@ -69,7 +59,7 @@ class UserControllerTest {
     @Order(1)
     @DisplayName("GET /v1/users return all users in a list")
     void findAll_ReturnAllUsers_WhenNameIsNull() throws Exception{
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
+        BDDMockito.when(repository.findAll()).thenReturn(userList);
 
         var response = readResourceFile("/users/get-users-null-name-200.json");
 
@@ -85,7 +75,8 @@ class UserControllerTest {
     @DisplayName("GET /v1/users?name=Guts returns a user in a list")
     void findAll_ReturnUserInList_WhenNameIsFound() throws Exception{
         var name = userList.getFirst().getFirstName();
-        BDDMockito.when(userData.getUsers()).thenReturn(List.of(userList.getFirst()));
+
+        BDDMockito.when(repository.findByFirstNameIgnoreCase(name)).thenReturn(List.of(userList.getFirst()));
 
         var response = readResourceFile("/users/get-users-guts-name-200.json");
 
@@ -100,7 +91,7 @@ class UserControllerTest {
     @DisplayName("GET /v1/users?name=X returns a empty list when name is x")
     void findAll_ReturnEmptyList_WhenNameIsX() throws Exception{
         var name = "Yoichi Isagi";
-        BDDMockito.when(userData.getUsers()).thenReturn(List.of());
+        BDDMockito.when(repository.findByFirstNameIgnoreCase(name)).thenReturn(List.of());
 
         var response = readResourceFile("/users/get-users-x-name-200.json");
 
@@ -115,7 +106,8 @@ class UserControllerTest {
     @DisplayName("GET /v1/users/1 findById return an user")
     void findById_ReturnUser_WhenIdIsFound() throws Exception{
         var id = userList.getFirst().getId();
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
+
+        BDDMockito.when(repository.findById(id)).thenReturn(Optional.of(userList.getFirst()));
 
         var response = readResourceFile("/users/get-users-by-id-200.json");
 
@@ -130,7 +122,6 @@ class UserControllerTest {
     @DisplayName("GET /v1/users/99 findById throws an ResponseStatusException")
     void findById_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception{
         var id = 99L;
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
 
         var response = readResourceFile("/users/get-users-by-id-404.json");
 
@@ -149,38 +140,57 @@ class UserControllerTest {
         var request = readResourceFile("/users/post-request-users-200.json");
         var response = readResourceFile("/users/post-response-users-201.json");
 
-        BDDMockito.when(service.save(ArgumentMatchers.any())).thenReturn(userToSave);
+        BDDMockito.when(repository.save(ArgumentMatchers.any())).thenReturn(userToSave);
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL)
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
     @Test
     @Order(7)
+    @DisplayName("POST /v1/users throws ResponseStatusException when email already exists")
+    void save_ThrowsResponseStatusException_WhenEmailAlreadyExists() throws Exception{
+        var userToSave = User.builder().id(99L).firstName("Yoichi").lastName("Isagi").email("yoichi.isagi@fromblue.com").build();
+
+        var request = readResourceFile("/users/post-request-users-200.json");
+        var response = readResourceFile("/users/post-response-users-400.json");
+
+        BDDMockito.when(repository.findByEmail(userToSave.getEmail())).thenReturn(Optional.of(userToSave));
+        BDDMockito.when(repository.save(ArgumentMatchers.any())).thenReturn(userToSave);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(URL)
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().json(response));
+    }
+
+    @Test
+    @Order(8)
     @DisplayName("DELETE /v1/users/1 deletes an user with id exists")
     void delete_DeleteUser_WhenIdExists() throws Exception{
-        var id = userList.getFirst().getId();
+        var userToDelete = userList.getFirst();
 
-        BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(userList.getFirst()));
+        BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(userToDelete));
 
-        mockMvc.perform(MockMvcRequestBuilders.delete(URL+"/{id}",id))
+        mockMvc.perform(MockMvcRequestBuilders.delete(URL+"/{id}", userToDelete.getId()))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @DisplayName("DELETE /v1/users/99 throws ResponseStatusException")
     void delete_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception{
         var id = 99L;
-
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
 
         var response = readResourceFile("/users/get-users-by-id-404.json");
 
@@ -191,14 +201,14 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     @DisplayName("PUT /v1/users updates an user when id exists")
     void update_UpdateUser_WhenIdExists() throws Exception{
         var userToUpdate = userList.getFirst();
 
         var request = readResourceFile("/users/put-request-users-200.json");
 
-        BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
+        BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(userToUpdate));
 
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -208,7 +218,7 @@ class UserControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     @DisplayName("PUT /v1/users throws ResponseStatusException an user when id is not found")
     void update_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception{
         var userToUpdate = userList.getFirst();
@@ -224,9 +234,29 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
+    @Test
+    @Order(12)
+    @DisplayName("PUT /v1/users throws ResponseStatusException when email already exists")
+    void update_ThrowsResponseStatusException_WhenEmailAlreadyExists() throws Exception{
+        var userToUpdate = userList.getFirst();
+
+        var request = readResourceFile("/users/put-request-users-404.json");
+        var response = readResourceFile("/users/put-response-users-400.json");
+
+        BDDMockito.when(repository.findById(ArgumentMatchers.anyLong())).thenReturn(Optional.of(userToUpdate));
+        BDDMockito.when(repository.findByEmailAndIdNot(ArgumentMatchers.anyString(), ArgumentMatchers.anyLong())).thenReturn(Optional.of(userToUpdate));
+
+        mockMvc.perform(MockMvcRequestBuilders.put(URL)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(request))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().json(response));
+    }
+
     @ParameterizedTest
     @MethodSource("postUserBadRequestSource")
-    @Order(11)
+    @Order(13)
     @DisplayName("POST /v1/users return bad request when fields are empty")
     void save_ReturnBadRequest_WhenFieldsEmpty(String filename, List<String> errors) throws Exception{
         var request = readResourceFile("/users/%s".formatted(filename));
@@ -248,7 +278,7 @@ class UserControllerTest {
 
     @ParameterizedTest
     @MethodSource("putUserBadRequestSource")
-    @Order(12)
+    @Order(14)
     @DisplayName("PUT /v1/users returns bad request when field are empty")
     void update_ReturnBadRequest_WhenFieldsEmpty(String filename, List<String> errors) throws Exception{
 

@@ -1,7 +1,8 @@
 package com.example.users_microservice.services;
 
 import com.example.users_microservice.domain.User;
-import com.example.users_microservice.repository.UserHardCodedRepository;
+import com.example.users_microservice.repository.UserRepository;
+import com.exemple.dev_dojo.EmailAlreadyExistsException;
 import com.exemple.dev_dojo.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -18,29 +18,42 @@ import java.util.Optional;
 @Slf4j
 public class UserService {
 
-    private final UserHardCodedRepository repository;
+    private final UserRepository repository;
 
     public List<User> findAll(String name) {
-        return name == null ? repository.findAll() : repository.findByName(name);
+        return name == null ? repository.findAll() : repository.findByFirstNameIgnoreCase(name);
     }
 
-    public User findById(Long id) {
+    public User findByIdOrThrowNotFound(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User Not Found"));
     }
 
     public User save(User user){
+        assertEmailDoesNotExist(user.getEmail());
         return repository.save(user);
     }
 
     public void delete(Long id) {
-        var userToDelete = findById(id);
+        var userToDelete = findByIdOrThrowNotFound(id);
         repository.delete(userToDelete);
     }
 
     public void update(User user) {
-        findById(user.getId());
+        findByIdOrThrowNotFound(user.getId());
+        assertEmailDoesNotExist(user.getEmail(), user.getId());
+        repository.save(user);
+    }
 
-        repository.update(user);
+    public void assertEmailDoesNotExist(String email){
+        repository.findByEmail(email).ifPresent(this::throwEmailExistsException);
+    }
+
+    public void assertEmailDoesNotExist(String email, Long id){
+        repository.findByEmailAndIdNot(email, id).ifPresent(this::throwEmailExistsException);
+    }
+
+    private void throwEmailExistsException(User user) {
+        throw new EmailAlreadyExistsException("Email %s already registered".formatted(user.getEmail()));
     }
 }

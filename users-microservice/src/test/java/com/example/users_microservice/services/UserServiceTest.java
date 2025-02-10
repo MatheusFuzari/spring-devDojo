@@ -1,7 +1,8 @@
 package com.example.users_microservice.services;
 
 import com.example.users_microservice.domain.User;
-import com.example.users_microservice.repository.UserHardCodedRepository;
+import com.example.users_microservice.repository.UserRepository;
+import com.exemple.dev_dojo.EmailAlreadyExistsException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,7 @@ class UserServiceTest {
     @InjectMocks
     UserService service;
     @Mock
-    UserHardCodedRepository repository;
+    UserRepository repository;
 
     private List<User> userList;
 
@@ -52,7 +53,7 @@ class UserServiceTest {
     void findAll_ReturnUserInList_WhenNameIsFound() {
         var userToFind = userList.getFirst();
 
-        BDDMockito.when(repository.findByName(userToFind.getFirstName())).thenReturn(List.of(userList.getFirst()));
+        BDDMockito.when(repository.findByFirstNameIgnoreCase(userToFind.getFirstName())).thenReturn(List.of(userList.getFirst()));
 
         var userFound = service.findAll(userToFind.getFirstName());
 
@@ -63,7 +64,7 @@ class UserServiceTest {
     @Order(3)
     @DisplayName("findAll returns a empty list when name is x")
     void findAll_ReturnEmptyList_WhenNameIsX(){
-        BDDMockito.when(repository.findByName("Eren Yegar")).thenReturn(List.of());
+        BDDMockito.when(repository.findByFirstNameIgnoreCase("Eren Yegar")).thenReturn(List.of());
 
         var user = service.findAll("Eren Yegar");
 
@@ -88,7 +89,7 @@ class UserServiceTest {
         BDDMockito.when(repository.findById(99L)).thenReturn(Optional.empty());
 
         Assertions.assertThatException()
-                .isThrownBy(() -> service.findById(99L))
+                .isThrownBy(() -> service.findByIdOrThrowNotFound(99L))
                 .isInstanceOf(ResponseStatusException.class);
     }
 
@@ -105,6 +106,20 @@ class UserServiceTest {
 
     @Test
     @Order(7)
+    @DisplayName("save throws ResponseStatusException when email already exists")
+    void save_ThrowsResponseStatusException_WhenEmailAlreadyExists(){
+        var emailAlreadyExistent = userList.getFirst();
+        //"yoichi.isagi@fromblue.com"
+        var userToSave = User.builder().id(99L).firstName("Yoichi").lastName("Isagi").email(emailAlreadyExistent.getEmail()).build();
+        BDDMockito.when(repository.findByEmail(emailAlreadyExistent.getEmail())).thenReturn(Optional.of(emailAlreadyExistent));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.save(userToSave))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+    @Order(8)
     @DisplayName("delete deletes an user id exists")
     void delete_DeleteUser_WhenIdExists(){
         var userToDelete = userList.getFirst();
@@ -115,7 +130,7 @@ class UserServiceTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @DisplayName("delete throws ResponseStatusException when id is not found")
     void delete_ThrowsResponseStatusException_WhenIdIsNotFound(){
         var id = 99L;
@@ -127,36 +142,45 @@ class UserServiceTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     @DisplayName("update updates an user when id exists")
     void update_UpdateUser_WhenIdExists(){
         var userToUpdate = userList.getFirst();
         userToUpdate.setEmail("monkey.d.luffy@fromOnePiece.com");
 
         BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
-        BDDMockito.doNothing().when(repository).update(userToUpdate);
-
-        repository.update(userToUpdate);
+        BDDMockito.when(repository.save(userToUpdate)).thenReturn(userToUpdate);
 
         Assertions.assertThatNoException()
                 .isThrownBy(() -> service.update(userToUpdate));
     }
 
     @Test
-    @Order(10)
-    @DisplayName("update throws ResponseStatusException an user when id is not found")
+    @Order(11)
+    @DisplayName("update throws ResponseStatusException when id is not found")
     void update_ThrowsResponseStatusException_WhenIdIsNotFound(){
         var userToUpdate = userList.getFirst();
-        userToUpdate.setEmail("monkey.d.luffy@fromOnePiece.com");
 
         BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.empty());
-        BDDMockito.doNothing().when(repository).update(userToUpdate);
-
-        repository.update(userToUpdate);
 
         Assertions.assertThatException()
                 .isThrownBy(() -> service.update(userToUpdate))
                 .isInstanceOf(ResponseStatusException.class);
     }
+
+    @Test
+    @Order(12)
+    @DisplayName("update throws ResponseStatusException when email already exists")
+    void update_ThrowsResponseStatusException_WhenEmailAlreadyExists(){
+        var userToUpdate = userList.getFirst();
+
+        BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
+        BDDMockito.when(repository.findByEmailAndIdNot(userToUpdate.getEmail(), userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
+
+        Assertions.assertThatException()
+                .isThrownBy(() -> service.update(userToUpdate))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
 
 }
