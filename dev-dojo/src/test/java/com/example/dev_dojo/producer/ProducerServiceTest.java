@@ -1,22 +1,16 @@
-package com.example.dev_dojo.service;
+package com.example.dev_dojo.producer;
 
 import com.example.dev_dojo.commons.ProducerUtils;
 import com.example.dev_dojo.domain.Producer;
-import com.example.dev_dojo.repository.ProducerHardCodedRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -24,7 +18,7 @@ class ProducerServiceTest {
     @InjectMocks
     private ProducerService service;
     @Mock
-    private ProducerHardCodedRepository repository;
+    private ProducerRepository repository;
     private List<Producer> producerList;
     @InjectMocks
     private ProducerUtils producerUtils;
@@ -149,7 +143,7 @@ class ProducerServiceTest {
         producerToUpdate.setName("Aniplex");
 
         BDDMockito.when(repository.findById(producerToUpdate.getId())).thenReturn(Optional.of(producerToUpdate));
-        BDDMockito.doNothing().when(repository).update(producerToUpdate);
+        BDDMockito.when(repository.save(producerToUpdate)).thenReturn(producerToUpdate);
 
         org.assertj.core.api.Assertions.assertThatNoException().isThrownBy(() -> service.update(producerToUpdate));
 

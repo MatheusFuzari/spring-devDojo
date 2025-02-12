@@ -1,12 +1,9 @@
-package com.example.dev_dojo.service;
+package com.example.dev_dojo.anime;
 
 import com.example.dev_dojo.domain.Anime;
-import com.example.dev_dojo.repository.AnimeHardCodedRepository;
-import com.exemple.dev_dojo.DefaultErrorMessage;
 import com.exemple.dev_dojo.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,18 +13,13 @@ import java.util.List;
 @Slf4j
 public class AnimeService {
 
-    private final AnimeHardCodedRepository repository;
-
+    private final AnimeRepository repository;
 
     public List<Anime> findAll(String name) {
-        return name == null ? repository.findAll() : repository.findByName(name);
+        return name == null ? repository.findAll() : repository.findByAnime(name);
     }
 
     public Anime findById(Long id) {
-        var teste = new DefaultErrorMessage(HttpStatus.NOT_FOUND.value(), "teste");
-
-        log.debug("teste pacote: "+teste);
-
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Anime Not Found"));
     }
@@ -43,7 +35,7 @@ public class AnimeService {
 
     public void update(Anime animeToUpdate) {
         assertAnimeExists(animeToUpdate.getId());
-        repository.update(animeToUpdate);
+        repository.save(animeToUpdate);
     }
 
     public void assertAnimeExists(Long id) {

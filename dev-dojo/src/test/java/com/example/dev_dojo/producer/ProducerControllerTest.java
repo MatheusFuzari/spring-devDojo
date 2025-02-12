@@ -1,11 +1,8 @@
-package com.example.dev_dojo.controller;
+package com.example.dev_dojo.producer;
 
 import com.example.dev_dojo.commons.FileUtils;
 import com.example.dev_dojo.commons.ProducerUtils;
 import com.example.dev_dojo.domain.Producer;
-import com.example.dev_dojo.repository.ProducerData;
-import com.example.dev_dojo.repository.ProducerHardCodedRepository;
-import com.example.dev_dojo.service.ProducerService;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -15,22 +12,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,25 +30,24 @@ import java.util.stream.Stream;
 
 @WebMvcTest(controllers = ProducerController.class) //Sliced Test
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ComponentScan(basePackages = {"com.example.dev_dojo"})
+@ComponentScan(basePackages = {"com.example.dev_dojo.producer", "com.example.dev_dojo.commons"})
+@AutoConfigureMockMvc
 @Slf4j
 //@ActiveProfiles("test")
 class ProducerControllerTest {
     private static final String URL = "/v1/producers";
 
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
+
     @MockitoBean
-    private ProducerData producerData;
-    @MockitoSpyBean
-    private ProducerHardCodedRepository repository;
-    @MockitoSpyBean
-    private ProducerService service;
+    ProducerRepository repository;
+
     private List<Producer> producers = new ArrayList<>();
     @Autowired
-    private FileUtils fileUtils;
+    FileUtils fileUtils;
     @Autowired
-    private ProducerUtils producerUtils;
+    ProducerUtils producerUtils;
 
 
     //Será executado antes de cada metodo.
@@ -71,7 +61,7 @@ class ProducerControllerTest {
     @DisplayName("GET v1/producers returns a list with all producers when argument is null")
     @Order(1)
     void findAll_ReturnsAllProducers_WhenArgumentIsNull() throws Exception {
-        BDDMockito.when(producerData.getProducers()).thenReturn(producers);
+        BDDMockito.when(repository.findAll()).thenReturn(producers);
 
         var response = fileUtils.readResourceFile("producer/get-producer-null-name-200.json");
 
@@ -83,7 +73,7 @@ class ProducerControllerTest {
     @DisplayName("GET v1/producers?name=Mappa returns a list with found producer when argument exists")
     @Order(2)
     void findByName_ReturnsFoundProducerInList_WhenNameIsFound() throws Exception {
-        BDDMockito.when(producerData.getProducers()).thenReturn(producers);
+        BDDMockito.when(repository.findByName("Mappa")).thenReturn(List.of(producers.getFirst()));
 
         var response = fileUtils.readResourceFile("producer/get-producer-mappa-name-200.json");
         String name = "Mappa";
@@ -95,10 +85,9 @@ class ProducerControllerTest {
     @DisplayName("GET v1/producers?name=x returns a empty list when argument exists but not found")
     @Order(3)
     void findByName_ReturnsEmptyList_WhenNameIsNotFound() throws Exception {
-        BDDMockito.when(producerData.getProducers()).thenReturn(producers);
+        BDDMockito.when(repository.findByName("x")).thenReturn(List.of());
 
         var response = fileUtils.readResourceFile("producer/get-producer-x-name-200.json");
-        String name = "Mappa";
 
         mockMvc.perform(MockMvcRequestBuilders.get(URL).param("name", "x")).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().json(response));
     }
@@ -107,10 +96,10 @@ class ProducerControllerTest {
     @DisplayName("GET v1/producers/id return one producer")
     @Order(4)
     void findById_ReturnsOneProducer_WhenSuccessful() throws Exception{
-        BDDMockito.when(producerData.getProducers()).thenReturn(producers);
-
         var response = fileUtils.readResourceFile("producer/get-producer-by-id-200.json");
         Long id = 1L;
+
+        BDDMockito.when(repository.findById(id)).thenReturn(Optional.of(producers.getFirst()));
 
         mockMvc.perform(MockMvcRequestBuilders.get(URL+"/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
@@ -123,7 +112,7 @@ class ProducerControllerTest {
     @DisplayName("GET v1/producers/id throws producer not found when producer is not found")
     @Order(5)
     void findById_ThrowsNotFound_WhenProducerIsNotFound() throws Exception{
-        BDDMockito.when(producerData.getProducers()).thenReturn(producers);
+        BDDMockito.when(repository.findAll()).thenReturn(producers);
         Long id = 99L;
 
         var response = fileUtils.readResourceFile("/producer/get-producer-by-id-404.json");
@@ -147,7 +136,7 @@ class ProducerControllerTest {
 
         log.debug("Producer to save: " + producerToSave);
 
-        BDDMockito.when(service.save(ArgumentMatchers.any())).thenReturn(producerToSave);
+        BDDMockito.when(repository.save(ArgumentMatchers.any())).thenReturn(producerToSave);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(URL)
@@ -182,7 +171,7 @@ class ProducerControllerTest {
     @DisplayName("PUT v1/producers update throws not found when producer is not found")
     @Order(8)
     void update_ThrowsNotFound_WhenProducerIsNotFound() throws Exception{
-        BDDMockito.when(producerData.getProducers()).thenReturn(producers);
+        BDDMockito.when(repository.findAll()).thenReturn(producers);
 
         var request = fileUtils.readResourceFile("producer/put-request-producer-404.json");
         var response = fileUtils.readResourceFile("/producer/get-producer-by-id-404.json");

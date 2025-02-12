@@ -3,6 +3,7 @@ package com.example.users_microservice.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+@With
 @Data
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

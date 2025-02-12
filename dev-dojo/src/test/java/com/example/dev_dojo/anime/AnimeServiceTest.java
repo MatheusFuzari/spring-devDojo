@@ -1,8 +1,7 @@
-package com.example.dev_dojo.service;
+package com.example.dev_dojo.anime;
 
 import com.example.dev_dojo.commons.AnimeUtils;
 import com.example.dev_dojo.domain.Anime;
-import com.example.dev_dojo.repository.AnimeHardCodedRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -12,11 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -26,7 +22,7 @@ class AnimeServiceTest {
     private AnimeService service;
 
     @Mock
-    private AnimeHardCodedRepository repository;
+    private AnimeRepository repository;
     private List<Anime> animeList;
     @InjectMocks
     private AnimeUtils animeUtils;
@@ -51,7 +47,7 @@ class AnimeServiceTest {
     @DisplayName("findAll should return empty list when name is not fond")
     @Order(2)
     void findByName_ReturnEmptyList_WhenNameIsNull(){
-        BDDMockito.when(repository.findByName("Shingeki")).thenReturn(List.of());
+        BDDMockito.when(repository.findByAnime("Shingeki")).thenReturn(List.of());
         var animes = service.findAll("Shingeki");
 
         org.assertj.core.api.Assertions.assertThat(animes).isEmpty();
@@ -62,7 +58,7 @@ class AnimeServiceTest {
     @Order(3)
     void findByName_ReturnAnime_WhenNameIsFound(){
         var animeFound = animeList.getFirst();
-        BDDMockito.when(repository.findByName(animeFound.getAnime())).thenReturn(List.of(animeFound));
+        BDDMockito.when(repository.findByAnime(animeFound.getAnime())).thenReturn(List.of(animeFound));
 
         var anime = service.findAll(animeFound.getAnime());
 
@@ -135,7 +131,7 @@ class AnimeServiceTest {
         var animeToUpdate = animeList.getFirst();
         animeToUpdate.setAnime("Jujutsu Kaisen");
         BDDMockito.when(repository.findById(animeToUpdate.getId())).thenReturn(Optional.of(animeToUpdate));
-        BDDMockito.doNothing().when(repository).update(animeToUpdate);
+        BDDMockito.when(repository.save(animeToUpdate)).thenReturn(animeToUpdate);
 
         org.assertj.core.api.Assertions.assertThatNoException().isThrownBy(() -> service.update(animeToUpdate));
     }

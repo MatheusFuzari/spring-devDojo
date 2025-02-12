@@ -1,11 +1,6 @@
-package com.example.dev_dojo.controller;
+package com.example.dev_dojo.anime;
 
 
-import com.example.dev_dojo.mapper.AnimeMapper;
-import com.example.dev_dojo.request.AnimePostRequest;
-import com.example.dev_dojo.request.AnimePutRequest;
-import com.example.dev_dojo.response.AnimeGetResponse;
-import com.example.dev_dojo.service.AnimeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

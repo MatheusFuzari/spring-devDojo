@@ -1,7 +1,6 @@
-package com.example.dev_dojo.service;
+package com.example.dev_dojo.producer;
 
 import com.example.dev_dojo.domain.Producer;
-import com.example.dev_dojo.repository.ProducerHardCodedRepository;
 import com.exemple.dev_dojo.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProducerService {
 
-    private final ProducerHardCodedRepository repository;
+    private final ProducerRepository repository;
 
     public List<Producer> findAll(String name){
         return name == null ? repository.findAll() : repository.findByName(name);
@@ -33,9 +32,11 @@ public class ProducerService {
     }
 
     public void update(Producer producerToUpdate) {
-        var producer = findById(producerToUpdate.getId());
-        producerToUpdate.setCreatedAt(producer.getCreatedAt());
-        repository.update(producerToUpdate);
+        assertProducerExists(producerToUpdate.getId());
+        repository.save(producerToUpdate);
     }
 
+    public void assertProducerExists(Long id) {
+        findById(id);
+    }
 }

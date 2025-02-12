@@ -1,18 +1,15 @@
-package com.example.dev_dojo.response;
+package com.example.dev_dojo.anime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProducerGetResponse {
+public class AnimeGetResponse {
     private Long id;
-    private LocalDateTime createdAt;
-    private String name;
+    private String anime;
 }

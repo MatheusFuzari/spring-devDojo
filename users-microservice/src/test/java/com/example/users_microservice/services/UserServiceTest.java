@@ -98,7 +98,10 @@ class UserServiceTest {
     @DisplayName("save creates an user when successful")
     void save_CreatesUser_WhenSuccessful(){
         var userToSave = User.builder().id(99L).firstName("Yoichi").lastName("Isagi").email("yoichi.isagi@fromblue.com").build();
+
         BDDMockito.when(service.save(userToSave)).thenReturn(userToSave);
+        BDDMockito.when(repository.findByEmail(userToSave.getEmail())).thenReturn(Optional.empty());
+
         var userCreated = service.save(userToSave);
 
         Assertions.assertThat(userCreated).hasNoNullFieldsOrProperties().isEqualTo(userToSave);
@@ -111,6 +114,7 @@ class UserServiceTest {
         var emailAlreadyExistent = userList.getFirst();
         //"yoichi.isagi@fromblue.com"
         var userToSave = User.builder().id(99L).firstName("Yoichi").lastName("Isagi").email(emailAlreadyExistent.getEmail()).build();
+
         BDDMockito.when(repository.findByEmail(emailAlreadyExistent.getEmail())).thenReturn(Optional.of(emailAlreadyExistent));
 
         Assertions.assertThatException()
@@ -145,10 +149,10 @@ class UserServiceTest {
     @Order(10)
     @DisplayName("update updates an user when id exists")
     void update_UpdateUser_WhenIdExists(){
-        var userToUpdate = userList.getFirst();
-        userToUpdate.setEmail("monkey.d.luffy@fromOnePiece.com");
+        var userToUpdate = userList.getFirst().withEmail("monkey.d.luffy@fromOnePiece.com");
 
         BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
+        BDDMockito.when(repository.findByEmailAndIdNot(userToUpdate.getEmail(), userToUpdate.getId())).thenReturn(Optional.empty());
         BDDMockito.when(repository.save(userToUpdate)).thenReturn(userToUpdate);
 
         Assertions.assertThatNoException()
@@ -170,12 +174,13 @@ class UserServiceTest {
 
     @Test
     @Order(12)
-    @DisplayName("update throws ResponseStatusException when email already exists")
-    void update_ThrowsResponseStatusException_WhenEmailAlreadyExists(){
+    @DisplayName("update throws ResponseStatusException when email belongs to another user")
+    void update_ThrowsResponseStatusException_WhenEmailBelongsToAnotherUser(){
+        var savedUser = userList.getLast();
         var userToUpdate = userList.getFirst();
 
         BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
-        BDDMockito.when(repository.findByEmailAndIdNot(userToUpdate.getEmail(), userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
+        BDDMockito.when(repository.findByEmailAndIdNot(userToUpdate.getEmail(), userToUpdate.getId())).thenReturn(Optional.of(savedUser));
 
         Assertions.assertThatException()
                 .isThrownBy(() -> service.update(userToUpdate))

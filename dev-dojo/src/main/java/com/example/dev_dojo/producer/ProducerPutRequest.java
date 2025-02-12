@@ -1,4 +1,4 @@
-package com.example.dev_dojo.request;
+package com.example.dev_dojo.producer;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -7,9 +7,9 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class AnimePutRequest {
+public class ProducerPutRequest {
     @NotNull(message = "The field 'id' cannot be null")
     private Long id;
-    @NotBlank(message = "The field 'anime' is required")
-    private String anime;
+    @NotBlank(message = "The field 'name' is required")
+    private String name;
 }

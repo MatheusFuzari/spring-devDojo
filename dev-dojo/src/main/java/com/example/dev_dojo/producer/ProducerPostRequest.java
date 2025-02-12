@@ -1,7 +1,6 @@
-package com.example.dev_dojo.request;
+package com.example.dev_dojo.producer;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
 

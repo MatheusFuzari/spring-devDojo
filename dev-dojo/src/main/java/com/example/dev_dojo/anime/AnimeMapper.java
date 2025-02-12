@@ -1,11 +1,7 @@
-package com.example.dev_dojo.mapper;
+package com.example.dev_dojo.anime;
 
 import com.example.dev_dojo.domain.Anime;
-import com.example.dev_dojo.request.AnimePostRequest;
-import com.example.dev_dojo.request.AnimePutRequest;
-import com.example.dev_dojo.response.AnimeGetResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.factory.Mappers;
 
@@ -16,7 +12,7 @@ public interface AnimeMapper {
 
     AnimeMapper MAPPER = Mappers.getMapper(AnimeMapper.class);
 
-    @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(100_000))")
+    // @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(100_000))")
     Anime toAnime(AnimePostRequest postRequest);
 
     Anime toAnime(AnimePutRequest putRequest);

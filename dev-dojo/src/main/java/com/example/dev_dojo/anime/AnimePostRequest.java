@@ -1,4 +1,4 @@
-package com.example.dev_dojo.request;
+package com.example.dev_dojo.anime;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

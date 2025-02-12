@@ -1,12 +1,7 @@
-package com.example.dev_dojo.controller;
+package com.example.dev_dojo.producer;
 
 
 import com.example.dev_dojo.domain.Producer;
-import com.example.dev_dojo.mapper.ProducerMapper;
-import com.example.dev_dojo.request.ProducerPostRequest;
-import com.example.dev_dojo.request.ProducerPutRequest;
-import com.example.dev_dojo.response.ProducerGetResponse;
-import com.example.dev_dojo.service.ProducerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
