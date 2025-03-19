@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User Not Found"));
     }
 
+    @Transactional
     public User save(User user){
         assertEmailDoesNotExist(user.getEmail());
         return repository.save(user);

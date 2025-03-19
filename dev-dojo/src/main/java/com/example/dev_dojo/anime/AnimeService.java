@@ -4,7 +4,10 @@ import com.example.dev_dojo.domain.Anime;
 import com.exemple.dev_dojo.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,11 +22,16 @@ public class AnimeService {
         return name == null ? repository.findAll() : repository.findByAnime(name);
     }
 
+    public Page<Anime> findAllPaginated(Pageable page) {
+        return repository.findAll(page);
+    }
+
     public Anime findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Anime Not Found"));
     }
 
+    @Transactional
     public Anime save(Anime anime) {
         return repository.save(anime);
     }

@@ -1,9 +1,12 @@
 package com.example.dev_dojo.anime;
 
 
+import com.example.dev_dojo.domain.Anime;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,13 @@ public class AnimeController {
         List<AnimeGetResponse> animeGetResponseList = MAPPER.toAnimeGetResponseList(animes);
 
         return ResponseEntity.status(HttpStatus.OK).body(animeGetResponseList);
+    }
+
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<Anime>> animesPaged(Pageable page) {
+
+        var animePaginated = service.findAllPaginated(page);
+        return ResponseEntity.status(HttpStatus.OK).body(animePaginated);
     }
 
     @GetMapping("{id}")

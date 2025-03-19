@@ -1,0 +1,45 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "anime": "Berserk"
+    },
+    {
+      "id": 2,
+      "anime": "Jujutsu Kaisen"
+    },
+    {
+      "id": 3,
+      "anime": "Soul Eater"
+    },
+    {
+      "id": 4,
+      "anime": "Bleach"
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 4,
+    "sort": {
+      "sorted": false,
+      "empty": true,
+      "unsorted": true
+    },
+    "offset": 0,
+    "unpaged": false,
+    "paged": true
+  },
+  "last": true,
+  "totalElements": 4,
+  "totalPages": 1,
+  "size": 4,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "empty": true,
+    "unsorted": true
+  },
+  "first": true,
+  "numberOfElements": 4,
+  "empty": false
+}
