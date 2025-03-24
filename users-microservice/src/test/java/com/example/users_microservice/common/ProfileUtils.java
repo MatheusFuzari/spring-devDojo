@@ -11,8 +11,9 @@ public class ProfileUtils {
 
     public List<Profile> newProfiles() {
         var admin = new Profile().withId(1L).withName("Admin").withDescription("Admin Profile");
-        var supervisor = new Profile().withId(2L).withName("Supervisor").withDescription("Supervisor Profile");
-        var employee = new Profile().withId(3L).withName("Employee").withDescription("Employee Profile");
-        return List.of(admin, supervisor, employee);
+        var manager = new Profile().withId(2L).withName("Manager").withDescription("Manager Profile");
+        var supervisor = new Profile().withId(3L).withName("Supervisor").withDescription("Supervisor Profile");
+        var employee = new Profile().withId(4L).withName("Employee").withDescription("Employee Profile");
+        return List.of(admin, manager, supervisor, employee);
     }
 }

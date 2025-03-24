@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Admin",
+    "description": "Admin Profile"
+  },
+  {
+    "id": 2,
+    "name": "Manager",
+    "description": "Manager Profile"
+  },
+  {
+    "id": 3,
+    "name": "Supervisor",
+    "description": "Supervisor Profile"
+  },
+  {
+    "id": 4,
+    "name": "Employee",
+    "description": "Employee Profile"
+  }
+]
