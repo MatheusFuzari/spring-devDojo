@@ -3,6 +3,8 @@ package com.example.users_microservice.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @With
 @Data
 @Builder
@@ -10,6 +12,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@NamedEntityGraph(
+    name = "UserProfile.fullDetails",
+    attributeNodes = {
+        @NamedAttributeNode("user"),
+        @NamedAttributeNode("profile")
+    }
+)
 public class UserProfile {
 
     @EqualsAndHashCode.Include
@@ -17,10 +26,10 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Profile profile;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private User user;
 
 }

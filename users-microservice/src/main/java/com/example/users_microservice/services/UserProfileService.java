@@ -1,6 +1,7 @@
 package com.example.users_microservice.services;
 
 import com.example.users_microservice.domain.Profile;
+import com.example.users_microservice.domain.User;
 import com.example.users_microservice.domain.UserProfile;
 import com.example.users_microservice.repository.ProfileRepository;
 import com.example.users_microservice.repository.UserProfileRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,5 +23,9 @@ public class UserProfileService {
 
     public List<UserProfile> findAll() {
         return this.repository.findAll();
+    }
+
+    public List<User> findAllUsersByProfileId(Long id) {
+        return this.repository.findAllUsersByProfileId(id);
     }
 }

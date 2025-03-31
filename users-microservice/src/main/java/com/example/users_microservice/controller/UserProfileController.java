@@ -4,8 +4,10 @@ import com.example.users_microservice.domain.User;
 import com.example.users_microservice.domain.UserProfile;
 import com.example.users_microservice.dto.request.PostUserRequestDTO;
 import com.example.users_microservice.dto.request.PutUserRequestDTO;
+import com.example.users_microservice.dto.response.GetUserProfileResponseDTO;
 import com.example.users_microservice.dto.response.GetUserResponseDTO;
 import com.example.users_microservice.mapper.UserMapper;
+import com.example.users_microservice.mapper.UserProfileMapper;
 import com.example.users_microservice.repository.UserProfileRepository;
 import com.example.users_microservice.services.UserProfileService;
 import com.example.users_microservice.services.UserService;
@@ -26,9 +28,21 @@ public class UserProfileController {
 
     private final UserProfileService service;
 
+    private final UserProfileMapper mapper;
+
     @GetMapping
-    public ResponseEntity<List<UserProfile>> getUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
+    public ResponseEntity<List<GetUserProfileResponseDTO>> getUsers() {
+
+        var userProfileResponsesDTO = mapper.toGetUserProfileResponseDTO(service.findAll());
+
+        return ResponseEntity.status(HttpStatus.OK).body(userProfileResponsesDTO);
+    }
+
+    @GetMapping("/profile/{id}/users")
+    public ResponseEntity<List<GetUserResponseDTO>> getUsersByProfile(@PathVariable Long id) {
+        var userProfileResponseDTO = mapper.toGetUserResponseDTO(service.findAllUsersByProfileId(id));
+
+        return ResponseEntity.status(HttpStatus.OK).body(userProfileResponseDTO);
     }
 
 }
