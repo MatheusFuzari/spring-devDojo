@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @NamedEntityGraph(
-    name = "UserProfile.fullDetails",
-    attributeNodes = {
-        @NamedAttributeNode("user"),
-        @NamedAttributeNode("profile")
-    }
+        name = "UserProfile.fullDetails",
+        attributeNodes = {
+                @NamedAttributeNode("user"),
+                @NamedAttributeNode("profile")
+        }
 )
 public class UserProfile {
 

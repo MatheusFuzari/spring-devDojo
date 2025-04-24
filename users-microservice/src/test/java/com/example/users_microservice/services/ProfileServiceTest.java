@@ -10,13 +10,9 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +34,7 @@ class ProfileServiceTest {
 
     @BeforeEach
     void init(){
-        profileList = profileUtils.newProfiles();
+        profileList = profileUtils.newProfilesList();
     }
 
     @Test
@@ -69,8 +65,8 @@ class ProfileServiceTest {
     @DisplayName("createProfile return a profile")
     @Order(3)
     void createProfile_ReturnProfile_WhenSuccessful() {
-        var profileToCreate = new Profile().withId(5L).withName("Tertiary").withDescription("Tertiary profile");
-        BDDMockito.when(repository.save(BDDMockito.any(Profile.class))).thenReturn(profileToCreate);
+        var profileToCreate = profileUtils.newProfileToSave();
+        BDDMockito.when(repository.save(BDDMockito.any(Profile.class))).thenReturn(profileUtils.newProfileSaved());
 
         var profileCreate = service.createProfile(profileToCreate);
 

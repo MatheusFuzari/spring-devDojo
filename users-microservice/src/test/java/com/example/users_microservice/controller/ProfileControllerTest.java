@@ -3,11 +3,8 @@ package com.example.users_microservice.controller;
 import com.example.users_microservice.common.FileUtils;
 import com.example.users_microservice.common.ProfileUtils;
 import com.example.users_microservice.domain.Profile;
-import com.example.users_microservice.domain.User;
 import com.example.users_microservice.repository.ProfileRepository;
-import com.example.users_microservice.repository.UserRepository;
 import com.example.users_microservice.services.ProfileService;
-import com.example.users_microservice.services.UserService;
 import org.junit.jupiter.api.*;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(ProfileController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -45,7 +40,7 @@ class ProfileControllerTest {
 
     @BeforeEach
     void init() {
-        profileList = profileUtils.newProfiles();
+        profileList = profileUtils.newProfilesList();
     }
 
 
