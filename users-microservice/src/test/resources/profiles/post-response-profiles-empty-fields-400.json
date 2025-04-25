@@ -1,0 +1,7 @@
+{
+  "status": 400,
+  "message": [
+    "The field 'name' can not be null or empty",
+    "The field 'description' can not be null or empty"
+  ]
+}
