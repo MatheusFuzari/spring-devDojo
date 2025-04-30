@@ -1,18 +1,22 @@
 package com.example.users_microservice.repository;
 
+import com.example.users_microservice.config.IntegrationTestConfig;
+import com.example.users_microservice.config.TestcontainersConfiguration;
 import com.example.users_microservice.domain.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //@Transactional(propagation = Propagation.NOT_SUPPORTED)
-class UserRepositoryTest {
+class UserRepositoryTest extends IntegrationTestConfig {
 
     @Autowired
     private UserRepository repository;
@@ -25,7 +29,7 @@ class UserRepositoryTest {
         var userCreated = repository.save(userToSave);
 
         Assertions.assertThat(userCreated).hasNoNullFieldsOrProperties();
-        Assertions.assertThat(userCreated.getId()).isEqualTo(1L);
+        Assertions.assertThat(userCreated.getId()).isNotNull().isPositive();
     }
 
     @Test

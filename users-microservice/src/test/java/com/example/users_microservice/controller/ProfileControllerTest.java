@@ -4,11 +4,14 @@ import com.example.users_microservice.common.FileUtils;
 import com.example.users_microservice.common.ProfileUtils;
 import com.example.users_microservice.domain.Profile;
 import com.example.users_microservice.repository.ProfileRepository;
+import com.example.users_microservice.repository.UserProfileRepository;
+import com.example.users_microservice.repository.UserRepository;
 import com.example.users_microservice.services.ProfileService;
 import org.junit.jupiter.api.*;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,13 +22,22 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-@WebMvcTest(ProfileController.class)
+@WebMvcTest(controllers = ProfileController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ContextConfiguration(classes = {Profile.class, ProfileRepository.class, ProfileController.class, ProfileService.class, FileUtils.class, ProfileUtils.class})
+@ComponentScan(basePackages = {"com.example"})
 class ProfileControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private UserRepository repository;
+
+    @MockitoBean
+    private ProfileRepository profileRepository;
+
+    @MockitoBean
+    private UserProfileRepository userProfileRepository;
 
     @MockitoBean
     private ProfileService service;

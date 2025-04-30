@@ -2,7 +2,7 @@ package com.example.users_microservice.controller;
 
 import com.example.users_microservice.common.FileUtils;
 import com.example.users_microservice.common.ProfileUtils;
-import com.example.users_microservice.config.TestcontainersConfiguration;
+import com.example.users_microservice.config.IntegrationTestConfig;
 import com.example.users_microservice.domain.Profile;
 import com.example.users_microservice.dto.response.GetProfileResponseDTO;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
@@ -15,7 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
@@ -28,8 +27,7 @@ import java.util.stream.Stream;
 //Integration test inits tomcat in a random port
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
-@Import(TestcontainersConfiguration.class)
-class ProfileControllerIT {
+class ProfileControllerIT extends IntegrationTestConfig {
     private static final String URL = "/v1/profiles";
 
     @Autowired

@@ -32,6 +32,7 @@
 		<mapstruct.version>1.6.3</mapstruct.version>
 		<datasource-proxy-spring-boot-starter.version>1.9.2</datasource-proxy-spring-boot-starter.version>
 		<commons-core.version>0.0.1-SNAPSHOT</commons-core.version>
+		<spring-boot-testcontainers.version>3.4.2</spring-boot-testcontainers.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -95,7 +96,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-testcontainers</artifactId>
-			<version>3.4.2</version>
+			<version>${spring-boot-testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 
