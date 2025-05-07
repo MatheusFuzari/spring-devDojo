@@ -5,6 +5,7 @@ import com.example.users_microservice.common.ProfileUtils;
 import com.example.users_microservice.config.IntegrationTestConfig;
 import com.example.users_microservice.domain.Profile;
 import com.example.users_microservice.dto.response.GetProfileResponseDTO;
+import com.example.users_microservice.repository.ProfileRepository;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import net.javacrumbs.jsonunit.core.Option;
 import org.assertj.core.api.Assertions;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +28,7 @@ import java.util.stream.Stream;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 //Integration test inits tomcat in a random port
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Transactional
+//We also can use instead of a SQL Script to delete all, an annotation called @DirtiesContext and execute before every method.
 class ProfileControllerIT extends IntegrationTestConfig {
     private static final String URL = "/v1/profiles";
 
@@ -54,7 +56,8 @@ class ProfileControllerIT extends IntegrationTestConfig {
 
     @Test
     @DisplayName("GET /v1/profiles returns a list of profiles when successful")
-    @Sql(value = "/sql/init_two_profiles.sql") //Need SQL Injection to have data to return xD;
+    @Sql(value = "/sql/init_two_profiles.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) //SQL Injection create profile data to use in the test;
+    @Sql(value = "/sql/clean_profiles.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) //SQL Injection to clean all data after the method;
     @Order(1)
     void findAll_ReturnsAllProfiles_WhenSuccessful() {
         var typeReference = new ParameterizedTypeReference<List<GetProfileResponseDTO>>() {
@@ -64,7 +67,7 @@ class ProfileControllerIT extends IntegrationTestConfig {
 
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Assertions.assertThat(response.getBody()).isNotNull().doesNotContainNull();
+        Assertions.assertThat(response.getBody()).isNotEmpty().doesNotContainNull();
 
         response.getBody().forEach(getProfileResponseDTO -> Assertions.assertThat(getProfileResponseDTO).hasNoNullFieldsOrProperties());
     }
