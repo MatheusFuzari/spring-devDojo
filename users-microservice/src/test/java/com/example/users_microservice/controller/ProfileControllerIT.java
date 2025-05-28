@@ -5,7 +5,6 @@ import com.example.users_microservice.common.ProfileUtils;
 import com.example.users_microservice.config.IntegrationTestConfig;
 import com.example.users_microservice.domain.Profile;
 import com.example.users_microservice.dto.response.GetProfileResponseDTO;
-import com.example.users_microservice.repository.ProfileRepository;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import net.javacrumbs.jsonunit.core.Option;
 import org.assertj.core.api.Assertions;
@@ -18,9 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -123,7 +120,5 @@ class ProfileControllerIT extends IntegrationTestConfig {
                 .whenIgnoringPaths("timestamp")
                 .when(Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo(expectedResponse);
-
-
     }
 }

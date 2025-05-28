@@ -10,10 +10,8 @@ public class ProfileUtils {
 
     public List<Profile> newProfilesList() {
         var admin = new Profile().withId(1L).withName("Admin").withDescription("Admin Profile");
-        var manager = new Profile().withId(2L).withName("Manager").withDescription("Manager Profile");
-        var supervisor = new Profile().withId(3L).withName("Supervisor").withDescription("Supervisor Profile");
-        var employee = new Profile().withId(4L).withName("Employee").withDescription("Employee Profile");
-        return List.of(admin, manager, supervisor, employee);
+        var viewer = new Profile().withId(2L).withName("Viewer").withDescription("Viewer Profile");
+        return List.of(admin, viewer);
     }
 
     public Profile newProfileToSave() {
