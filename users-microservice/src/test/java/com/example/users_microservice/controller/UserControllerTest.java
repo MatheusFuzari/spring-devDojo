@@ -1,13 +1,10 @@
 package com.example.users_microservice.controller;
 
 import com.example.users_microservice.common.FileUtils;
-import com.example.users_microservice.config.TestcontainersConfiguration;
 import com.example.users_microservice.domain.User;
 import com.example.users_microservice.repository.ProfileRepository;
 import com.example.users_microservice.repository.UserProfileRepository;
 import com.example.users_microservice.repository.UserRepository;
-import com.example.users_microservice.services.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,11 +14,8 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -98,7 +92,7 @@ class UserControllerTest {
 
     @BeforeEach
     void init() {
-        var guts = User.builder().id(1L).firstName("Guts").lastName("").email("guts@fromberserk.com").build();
+        var guts = User.builder().id(1L).firstName("Guts").lastName("Bersek").email("guts@fromberserk.com").build();
         var yuji = User.builder().id(2L).firstName("Yuji").lastName("Itadori").email("yuji.itadori@fromjujusu.com").build();
         var kaneki = User.builder().id(3L).firstName("Ken").lastName("Kaneki").email("Ken.Kaneki@fromghoul.com").build();
 
@@ -186,7 +180,7 @@ class UserControllerTest {
     @Order(6)
     @DisplayName("POST /v1/users creates an user when successful")
     void save_CreatesUser_WhenSuccessful() throws Exception {
-        var userToSave = User.builder().id(99L).firstName("Yoichi").lastName("Isagi").email("yoichi.isagi@fromblue.com").build();
+        var userToSave = User.builder().id(99L).firstName("Guts").lastName("Bersek").email("guts@fromberserk.com").build();
 
         var request = utils.readResourceFile("/users/post-request-users-200.json");
         var response = utils.readResourceFile("/users/post-response-users-201.json");
@@ -206,7 +200,7 @@ class UserControllerTest {
     @Order(7)
     @DisplayName("POST /v1/users throws ResponseStatusException when email already exists")
     void save_ThrowsResponseStatusException_WhenEmailAlreadyExists() throws Exception {
-        var userToSave = User.builder().id(99L).firstName("Yoichi").lastName("Isagi").email("yoichi.isagi@fromblue.com").build();
+        var userToSave = User.builder().id(99L).firstName("Guts").lastName("Bersek").email("guts@fromberserk.com").build();
 
         var request = utils.readResourceFile("/users/post-request-users-200.json");
         var response = utils.readResourceFile("/users/post-response-users-400.json");

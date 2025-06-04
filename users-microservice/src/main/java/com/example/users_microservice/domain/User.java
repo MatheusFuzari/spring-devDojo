@@ -1,5 +1,6 @@
 package com.example.users_microservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     public String getFullName() {
         return firstName+" "+lastName;
     }

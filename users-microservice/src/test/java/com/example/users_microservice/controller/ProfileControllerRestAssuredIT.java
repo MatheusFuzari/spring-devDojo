@@ -1,11 +1,11 @@
 package com.example.users_microservice.controller;
 
 import com.example.users_microservice.common.FileUtils;
-import com.example.users_microservice.common.ProfileUtils;
 import com.example.users_microservice.config.IntegrationTestConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
+import net.javacrumbs.jsonunit.core.Option;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,8 +26,6 @@ class ProfileControllerRestAssuredIT extends IntegrationTestConfig {
     private static final String URL = "/v1/profiles";
 
     @Autowired
-    private ProfileUtils profileUtils;
-    @Autowired
     private FileUtils fileUtils;
     @LocalServerPort
     private int port;
@@ -40,8 +38,8 @@ class ProfileControllerRestAssuredIT extends IntegrationTestConfig {
 
     @Test
     @DisplayName("GET /v1/profiles returns a list of profiles when successful")
-    @Sql(value = "/sql/init_two_profiles.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) //SQL Injection create profile data to use in the test;
-    @Sql(value = "/sql/clean_profiles.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) //SQL Injection to clean all data after the method;
+    @Sql(value = "/sql/profiles/init_two_profiles.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) //SQL Injection create profile data to use in the test;
+    @Sql(value = "/sql/profiles/clean_profiles.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) //SQL Injection to clean all data after the method;
     @Order(1)
     void findAll_ReturnsAllProfiles_WhenSuccessful() {
         var response = fileUtils.readResourceFile("/profiles/get-all-profiles-200.json");
@@ -107,9 +105,9 @@ class ProfileControllerRestAssuredIT extends IntegrationTestConfig {
     @Order(4)
     void save_ReturnsBadRequest_WhenFieldAreInvalid(String requestFile, String responseFile) throws Exception {
         var request = fileUtils.readResourceFile("profiles/%s".formatted(requestFile));
-        var expectedResponse = fileUtils.readResourceFile("profiles/%s".formatted(responseFile));
+        var expected_response = fileUtils.readResourceFile("profiles/%s".formatted(responseFile));
 
-        RestAssured
+        var response = RestAssured
                 .given()
                     .contentType(ContentType.JSON).accept(ContentType.JSON)
                     .body(request)
@@ -117,13 +115,13 @@ class ProfileControllerRestAssuredIT extends IntegrationTestConfig {
                     .post(URL)
                 .then()
                     .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .body(Matchers.equalTo(expectedResponse))
-                .log().all();
+                .log().all()
+                .extract().response().body().asString();
 
-//        JsonAssertions.assertThatJson(responseEntity.getBody())
-//                .whenIgnoringPaths("timestamp")
-//                .when(Option.IGNORING_ARRAY_ORDER)
-//                .isEqualTo(expectedResponse);
+        JsonAssertions.assertThatJson(response)
+                .whenIgnoringPaths("timestamp")
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo(expected_response);
     }
 
     private static Stream<Arguments> postProfileBadRequestSource() {

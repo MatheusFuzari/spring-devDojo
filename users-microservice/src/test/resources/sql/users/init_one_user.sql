@@ -1,0 +1,1 @@
+insert into user (id,email,first_name,last_name) values (1,'guts@fromberserk.com','Guts','Bersek')

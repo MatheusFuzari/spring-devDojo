@@ -53,8 +53,8 @@ class ProfileControllerIT extends IntegrationTestConfig {
 
     @Test
     @DisplayName("GET /v1/profiles returns a list of profiles when successful")
-    @Sql(value = "/sql/init_two_profiles.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) //SQL Injection create profile data to use in the test;
-    @Sql(value = "/sql/clean_profiles.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) //SQL Injection to clean all data after the method;
+    @Sql(value = "/sql/profiles/init_two_profiles.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD) //SQL Injection create profile data to use in the test;
+    @Sql(value = "/sql/profiles/clean_profiles.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) //SQL Injection to clean all data after the method;
     @Order(1)
     void findAll_ReturnsAllProfiles_WhenSuccessful() {
         var typeReference = new ParameterizedTypeReference<List<GetProfileResponseDTO>>() {

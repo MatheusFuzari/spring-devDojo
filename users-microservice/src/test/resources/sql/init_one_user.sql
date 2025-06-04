@@ -1,1 +1,0 @@
-insert into user (email,first_name,last_name) values ('yoichi.isagi@fromblue.com','Yoichi','Isagi')

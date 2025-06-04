@@ -1,8 +1,1 @@
-[
-  {
-    "id": 1,
-    "firstName": "Guts",
-    "lastName": "",
-    "email": "guts@fromberserk.com"
-  }
-]
+[{"id":1,"firstName":"Guts","lastName":"Bersek","email":"guts@fromberserk.com"}]

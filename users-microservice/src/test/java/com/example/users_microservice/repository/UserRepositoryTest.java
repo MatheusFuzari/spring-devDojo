@@ -1,15 +1,12 @@
 package com.example.users_microservice.repository;
 
 import com.example.users_microservice.config.IntegrationTestConfig;
-import com.example.users_microservice.config.TestcontainersConfiguration;
 import com.example.users_microservice.domain.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 @DataJpaTest
@@ -35,7 +32,7 @@ class UserRepositoryTest extends IntegrationTestConfig {
     @Test
     @Order(2)
     @DisplayName("findAll returns a list of users")
-    @Sql("/sql/init_one_user.sql")
+    @Sql("/sql/users/init_one_user.sql")
     void findAll_ReturnAllUsers_WhenSuccessful() {
         var users = repository.findAll();
         Assertions.assertThat(users).isNotEmpty();
