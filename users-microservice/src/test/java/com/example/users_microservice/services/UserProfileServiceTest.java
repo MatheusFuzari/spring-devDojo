@@ -14,8 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
 
 import java.util.List;
 
@@ -35,7 +33,7 @@ class UserProfileServiceTest {
     @InjectMocks
     private UserProfileUtils userProfileUtils;
 
-    @Spy //It's like an autowired for mockito dependencies outside spring boot context.
+    @Spy // It's like an autowired for mockito dependencies outside spring boot context.
     private UserUtils userUtils;
 
     @Spy

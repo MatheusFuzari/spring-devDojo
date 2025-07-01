@@ -19,6 +19,11 @@ logging:
   level:
     com.example.dev_dojo: debug
 
+springdoc:
+  swagger-ui:
+    operationsSorter: alpha
+    tagsSorter: method
+
 server:
   port: 8090
   servlet:

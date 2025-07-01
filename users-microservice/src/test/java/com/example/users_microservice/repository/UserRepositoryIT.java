@@ -13,7 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //@Transactional(propagation = Propagation.NOT_SUPPORTED)
-class UserRepositoryTest extends IntegrationTestConfig {
+class UserRepositoryIT extends IntegrationTestConfig {
 
     @Autowired
     private UserRepository repository;

@@ -12,4 +12,5 @@ spring:
         globally_quoted_identifiers: true
 server:
   error:
+    include-message: always
     include-binding-errors: ALWAYS

@@ -8,9 +8,10 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>parent-project</module>
 		<module>commons-core</module>
 		<module>dev-dojo</module>
 		<module>users-microservice</module>
-	</modules>
+    </modules>
 
 </project>

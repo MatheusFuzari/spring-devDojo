@@ -20,9 +20,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Stream;
 
 @lombok.extern.slf4j.Slf4j
@@ -311,8 +308,9 @@ class UserControllerRestAssuredIT extends IntegrationTestConfig {
     @MethodSource("postUserBadRequestSource")
     @Order(13)
     @DisplayName("POST /v1/users return bad request when fields are empty")
-    void save_ReturnBadRequest_WhenFieldsEmpty(String filename, List<String> errors) {
-        var request = fileUtils.readResourceFile("/users/%s".formatted(filename));
+    void save_ReturnBadRequest_WhenFieldsEmpty(String requestFile, String responseFile) {
+        var request = fileUtils.readResourceFile("/users/%s".formatted(requestFile));
+        var expectedResponse = fileUtils.readResourceFile("/users/%s".formatted(responseFile));
 
         var response = RestAssured.given()
                 .contentType(ContentType.JSON).accept(ContentType.JSON)
@@ -325,14 +323,8 @@ class UserControllerRestAssuredIT extends IntegrationTestConfig {
                 .extract().response().body().asString();
 
         JsonAssertions.assertThatJson(response)
-                .node("status")
-                .asNumber()
-                .isPositive();
-
-        JsonAssertions.assertThatJson(response)
                 .when(Option.IGNORING_ARRAY_ORDER)
-                .node("message")
-                .isEqualTo(errors);
+                .isEqualTo(expectedResponse);
 
     }
 
@@ -340,8 +332,9 @@ class UserControllerRestAssuredIT extends IntegrationTestConfig {
     @MethodSource("putUserBadRequestSource")
     @Order(14)
     @DisplayName("PUT /v1/users returns bad request when field are empty")
-    void update_ReturnBadRequest_WhenFieldsEmpty(String filename, List<String> errors) {
-        var request = fileUtils.readResourceFile("/users/%s".formatted(filename));
+    void update_ReturnBadRequest_WhenFieldsEmpty(String requestFile, String responseFile) {
+        var request = fileUtils.readResourceFile("/users/%s".formatted(requestFile));
+        var expectedResponse = fileUtils.readResourceFile("/users/%s".formatted(responseFile));
 
         var response = RestAssured.given()
                         .contentType(ContentType.JSON).accept(ContentType.JSON)
@@ -354,53 +347,25 @@ class UserControllerRestAssuredIT extends IntegrationTestConfig {
                         .extract().response().body().asString();
 
         JsonAssertions.assertThatJson(response)
-                .node("status")
-                .asNumber()
-                .isPositive();
-
-        JsonAssertions.assertThatJson(response)
                 .when(Option.IGNORING_ARRAY_ORDER)
-                .node("message")
-                .isEqualTo(errors);
+                .isEqualTo(expectedResponse);
 
-    }
-
-    public static List<String> invalidEmail() {
-        var emailInvalidError = "'email' is not valid";
-        return Collections.singletonList(emailInvalidError);
-    }
-
-    public static List<String> allRequiredErrors() {
-        var firstNameError = "The field 'firstName' is required";
-        var lastNameError = "The field 'lastName' is required";
-        var emailRequiredError = "The field 'email' is required";
-        var emailInvalidError = "'email' is not valid";
-        return new ArrayList<>(List.of(firstNameError, lastNameError, emailRequiredError, emailInvalidError));
     }
 
     private static Stream<Arguments> postUserBadRequestSource() {
-        var allErrors = allRequiredErrors();
-        var emailErrors = invalidEmail();
-
         return Stream.of(
-                Arguments.of("post-request-users-empty-fields-400.json", allErrors),
-                Arguments.of("post-request-users-blank-fields-400.json", allErrors),
-                Arguments.of("post-request-users-invalid-email-400.json", emailErrors)
+                Arguments.of("post-request-users-empty-fields-400.json", "post-response-users-empty-fields-400.json"),
+                Arguments.of("post-request-users-blank-fields-400.json", "post-response-users-blank-fields-400.json"),
+                Arguments.of("post-request-users-invalid-email-400.json", "post-response-users-invalid-email-400.json")
         );
     }
 
     private static Stream<Arguments> putUserBadRequestSource() {
-        var idNullError = "The field 'id' cannot be null";
-        var allErrors = allRequiredErrors();
-        var emailErrors = invalidEmail();
-        var idErrors = Collections.singletonList(idNullError);
-
-        allErrors.add(idNullError);
         return Stream.of(
-                Arguments.of("put-request-users-empty-fields-400.json", allErrors),
-                Arguments.of("put-request-users-blank-fields-400.json", allErrors),
-                Arguments.of("put-request-users-invalid-email-400.json", emailErrors),
-                Arguments.of("put-request-users-null-id-400.json", idErrors)
+                Arguments.of("put-request-users-empty-fields-400.json", "put-response-users-empty-fields-400.json"),
+                Arguments.of("put-request-users-blank-fields-400.json", "put-response-users-blank-fields-400.json"),
+                Arguments.of("put-request-users-invalid-email-400.json", "put-response-users-invalid-email-400.json"),
+                Arguments.of("put-request-users-null-id-400.json", "put-response-users-null-id-400.json")
         );
     }
 

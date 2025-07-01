@@ -114,7 +114,6 @@ class ProfileControllerIT extends IntegrationTestConfig {
         Assertions.assertThat(responseEntity).isNotNull();
         Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        System.out.println(responseEntity.getBody());
 
         JsonAssertions.assertThatJson(responseEntity.getBody())
                 .whenIgnoringPaths("timestamp")
