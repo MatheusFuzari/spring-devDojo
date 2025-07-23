@@ -5,6 +5,7 @@ import com.example.users_microservice.dto.request.PostProfileRequestDTO;
 import com.example.users_microservice.dto.response.GetProfileResponseDTO;
 import com.example.users_microservice.mapper.ProfileMapper;
 import com.example.users_microservice.services.ProfileService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/profiles")
 @RequiredArgsConstructor
 @Slf4j
+@SecurityRequirement(name = "basicAuth")
 public class ProfileController {
 
     private final ProfileService service;

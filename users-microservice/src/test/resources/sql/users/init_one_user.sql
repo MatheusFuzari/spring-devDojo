@@ -1,1 +1,1 @@
-insert into user (id,email,first_name,last_name) values (1,'guts@fromberserk.com','Guts','Bersek')
+insert into user (id,email,first_name,last_name,password,roles) values (1,'guts@fromberserk.com','Guts','Bersek','{bcrypt}$2a$10$LaNgnLoLcy8Y/vKvn3nmT.kNk1qXwV3jdwzHyblWulpzD3zatOZci','USER')

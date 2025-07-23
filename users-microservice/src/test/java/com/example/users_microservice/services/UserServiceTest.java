@@ -2,10 +2,12 @@ package com.example.users_microservice.services;
 
 import com.example.users_microservice.common.UserUtils;
 import com.example.users_microservice.domain.User;
+import com.example.users_microservice.mapper.UserMapper;
 import com.example.users_microservice.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,9 +25,12 @@ class UserServiceTest {
     UserService service;
     @Mock
     UserRepository repository;
+    @Mock
+    private UserMapper mapper;
 
     @InjectMocks
     private UserUtils userUtils;
+
 
     private List<User> userList;
 
@@ -146,6 +151,11 @@ class UserServiceTest {
         BDDMockito.when(repository.findById(userToUpdate.getId())).thenReturn(Optional.of(userToUpdate));
         BDDMockito.when(repository.findByEmailAndIdNot(userToUpdate.getEmail(), userToUpdate.getId())).thenReturn(Optional.empty());
         BDDMockito.when(repository.save(userToUpdate)).thenReturn(userToUpdate);
+        BDDMockito.when(
+                mapper.toUserWithPasswordAndRoles(
+                        ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()
+                )
+        ).thenReturn(userToUpdate);
 
         Assertions.assertThatNoException().isThrownBy(() -> service.update(userToUpdate));
     }

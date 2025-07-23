@@ -1,22 +1,18 @@
 package com.example.users_microservice.controller;
 
-import com.example.users_microservice.domain.User;
-import com.example.users_microservice.domain.UserProfile;
-import com.example.users_microservice.dto.request.PostUserRequestDTO;
-import com.example.users_microservice.dto.request.PutUserRequestDTO;
 import com.example.users_microservice.dto.response.GetUserProfileResponseDTO;
 import com.example.users_microservice.dto.response.GetUserResponseDTO;
-import com.example.users_microservice.mapper.UserMapper;
 import com.example.users_microservice.mapper.UserProfileMapper;
-import com.example.users_microservice.repository.UserProfileRepository;
 import com.example.users_microservice.services.UserProfileService;
-import com.example.users_microservice.services.UserService;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -24,6 +20,7 @@ import java.util.List;
 @RequestMapping("/v1/user-profiles")
 @RequiredArgsConstructor
 @Slf4j
+@SecurityRequirement(name = "basicAuth")
 public class UserProfileController {
 
     private final UserProfileService service;

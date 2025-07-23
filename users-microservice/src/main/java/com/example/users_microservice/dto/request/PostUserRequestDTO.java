@@ -24,4 +24,8 @@ public class PostUserRequestDTO {
     @Email(message = "'email' is not valid", regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     @Schema(description = "User's e-mail. Must be unique", example = "rin.itoshi@frombluelock.com")
     private String email;
+
+    @NotBlank(message = "The field 'password' is required")
+    @Schema(description = "User's password", example = "password123")
+    private String password;
 }

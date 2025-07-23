@@ -30,4 +30,5 @@ public class PutUserRequestDTO {
     @Email(message = "'email' is not valid", regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     @Schema(description = "User's e-mail. Must be unique", example = "rin.itoshi@frombluelock.com")
     private String email;
+    private String password;
 }

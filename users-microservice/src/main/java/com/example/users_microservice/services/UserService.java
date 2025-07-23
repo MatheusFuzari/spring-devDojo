@@ -1,15 +1,13 @@
 package com.example.users_microservice.services;
 
 import com.example.users_microservice.domain.User;
+import com.example.users_microservice.mapper.UserMapper;
 import com.example.users_microservice.repository.UserRepository;
 import com.exemple.dev_dojo.EmailAlreadyExistsException;
 import com.exemple.dev_dojo.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,6 +18,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository repository;
+    private final UserMapper mapper;
 
     public List<User> findAll(String name) {
         return name == null ? repository.findAll() : repository.findByFirstNameIgnoreCase(name);
@@ -30,7 +29,7 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User Not Found"));
     }
 
-    @Transactional
+//    @Transactional
     public User save(User user){
         assertEmailDoesNotExist(user.getEmail());
         return repository.save(user);
@@ -42,9 +41,12 @@ public class UserService {
     }
 
     public void update(User user) {
-        findByIdOrThrowNotFound(user.getId());
+        User savedUser = findByIdOrThrowNotFound(user.getId());
         assertEmailDoesNotExist(user.getEmail(), user.getId());
-        repository.save(user);
+
+        User userToSave = mapper.toUserWithPasswordAndRoles(user, user.getPassword(), savedUser);
+
+        repository.save(userToSave);
     }
 
     public void assertEmailDoesNotExist(String email){

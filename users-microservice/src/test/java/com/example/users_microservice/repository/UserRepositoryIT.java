@@ -1,28 +1,33 @@
 package com.example.users_microservice.repository;
 
+import com.example.users_microservice.common.UserUtils;
 import com.example.users_microservice.config.IntegrationTestConfig;
-import com.example.users_microservice.domain.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.jdbc.Sql;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //@Transactional(propagation = Propagation.NOT_SUPPORTED)
+@ComponentScan(basePackages = {"com.example.users_microservice.common"})
 class UserRepositoryIT extends IntegrationTestConfig {
 
     @Autowired
     private UserRepository repository;
 
+    @Autowired
+    private UserUtils userUtils;
+
     @Test
     @Order(1)
     @DisplayName("save creates an user when successful")
     void save_CreatesUser_WhenSuccessful() {
-        var userToSave = User.builder().firstName("Yoichi").lastName("Isagi").email("yoichi.isagi@fromblue.com").build();
+        var userToSave = userUtils.newUserToSave();
         var userCreated = repository.save(userToSave);
 
         Assertions.assertThat(userCreated).hasNoNullFieldsOrProperties();
