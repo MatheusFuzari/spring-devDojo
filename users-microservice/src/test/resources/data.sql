@@ -1,1 +1,0 @@
-insert into user (email,first_name,last_name,password,roles) values ('satoru.gojo@fromjujutsu.com','Gojo','Satoru','{bcrypt}$2a$10$LaNgnLoLcy8Y/vKvn3nmT.kNk1qXwV3jdwzHyblWulpzD3zatOZci','USER')

@@ -1,1 +1,1 @@
-{"id":99,"firstName":"Guts","lastName":"Bersek","email":"guts@fromberserk.com"}
+{"id":5,"firstName":"Guts","lastName":"Bersek","email":"guts@fromberserk.com","password":"{bcrypt}$2a$10$7HDM1H.g5IXCVL9gErgIN.lM2D5mcmEi9I6Q3qOx6wQ0zJIcDmBM2","roles":"USER","authorities":[{"authority":"USER"}],"username":"guts@fromberserk.com","enabled":true,"accountNonLocked":true,"credentialsNonExpired":true,"accountNonExpired":true}

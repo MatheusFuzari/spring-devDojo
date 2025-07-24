@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //{User.class, UserRepository.class, UserController.class, UserService.class, FileUtils.class}
 @ComponentScan(basePackages = {"com.example"})
+@WithMockUser
 class UserControllerTest {
     private static final String URL = "/v1/users";
 
@@ -102,6 +104,7 @@ class UserControllerTest {
     @Test
     @Order(1)
     @DisplayName("GET /v1/users return all users in a list")
+    @WithMockUser(authorities = "ADMIN")
     void findAll_ReturnAllUsers_WhenNameIsNull() throws Exception {
         BDDMockito.when(repository.findAll()).thenReturn(userList);
 
@@ -117,6 +120,7 @@ class UserControllerTest {
     @Test
     @Order(2)
     @DisplayName("GET /v1/users?name=Guts returns a user in a list")
+    @WithMockUser(authorities = "ADMIN")
     void findAll_ReturnUserInList_WhenNameIsFound() throws Exception {
         var name = userList.getFirst().getFirstName();
 
@@ -133,6 +137,7 @@ class UserControllerTest {
     @Test
     @Order(3)
     @DisplayName("GET /v1/users?name=X returns a empty list when name is x")
+    @WithMockUser(authorities = "ADMIN")
     void findAll_ReturnEmptyList_WhenNameIsX() throws Exception {
         var name = "Yoichi Isagi";
         BDDMockito.when(repository.findByFirstNameIgnoreCase(name)).thenReturn(List.of());
@@ -180,7 +185,7 @@ class UserControllerTest {
     @Order(6)
     @DisplayName("POST /v1/users creates an user when successful")
     void save_CreatesUser_WhenSuccessful() throws Exception {
-        var userToSave = User.builder().id(99L).firstName("Guts").lastName("Bersek").email("guts@fromberserk.com").build();
+        var userToSave = User.builder().id(99L).firstName("Guts").lastName("Bersek").email("guts@fromberserk.com").password("{bcrypt}$2a$10$LaNgnLoLcy8Y/vKvn3nmT.kNk1qXwV3jdwzHyblWulpzD3zatOZci").roles("USER").build();
 
         var request = utils.readResourceFile("/users/post-request-users-200.json");
         var response = utils.readResourceFile("/users/post-response-users-201.json");
@@ -220,6 +225,7 @@ class UserControllerTest {
     @Test
     @Order(8)
     @DisplayName("DELETE /v1/users/1 deletes an user with id exists")
+    @WithMockUser(authorities = "ADMIN")
     void delete_DeleteUser_WhenIdExists() throws Exception {
         var userToDelete = userList.getFirst();
 
@@ -234,6 +240,7 @@ class UserControllerTest {
     @Test
     @Order(9)
     @DisplayName("DELETE /v1/users/99 throws ResponseStatusException")
+    @WithMockUser(authorities = "ADMIN")
     void delete_ThrowsResponseStatusException_WhenIdIsNotFound() throws Exception {
         var id = 99L;
 

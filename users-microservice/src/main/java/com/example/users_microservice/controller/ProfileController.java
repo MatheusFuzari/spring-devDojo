@@ -28,22 +28,22 @@ public class ProfileController {
 
     private final ProfileMapper MAPPER = ProfileMapper.MAPPER;
 
-    @GetMapping()
-    private ResponseEntity<List<GetProfileResponseDTO>> getAllProfiles() {
+    @GetMapping
+    public ResponseEntity<List<GetProfileResponseDTO>> getAllProfiles() {
         var profiles = MAPPER.toGetResponseList(service.getAllProfiles());
 
         return ResponseEntity.status(HttpStatus.OK).body(profiles);
     }
 
     @GetMapping("/paginated")
-    private ResponseEntity<Page<Profile>> getAllProfilesPaginated(Pageable page) {
+    public ResponseEntity<Page<Profile>> getAllProfilesPaginated(Pageable page) {
         var profilesPaginated = service.getAllProfilesPaginated(page);
 
         return ResponseEntity.status(HttpStatus.OK).body(profilesPaginated);
     }
 
     @PostMapping()
-    private ResponseEntity<Profile> createProfile(@RequestBody @Valid PostProfileRequestDTO newProfile){
+    public ResponseEntity<Profile> createProfile(@RequestBody @Valid PostProfileRequestDTO newProfile){
         var profileToCreate = MAPPER.toProfile(newProfile);
         var createdProfile = service.createProfile(profileToCreate);
 

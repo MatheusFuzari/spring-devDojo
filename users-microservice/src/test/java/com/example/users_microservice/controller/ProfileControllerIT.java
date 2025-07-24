@@ -3,6 +3,7 @@ package com.example.users_microservice.controller;
 import com.example.users_microservice.common.FileUtils;
 import com.example.users_microservice.common.ProfileUtils;
 import com.example.users_microservice.config.IntegrationTestConfig;
+import com.example.users_microservice.config.TestRestTemplateConfig;
 import com.example.users_microservice.domain.Profile;
 import com.example.users_microservice.dto.response.GetProfileResponseDTO;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
@@ -18,14 +19,18 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = TestRestTemplateConfig.class)
 //Integration test inits tomcat in a random port
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //We also can use instead of a SQL Script to delete all, an annotation called @DirtiesContext and execute before every method.
+@Sql(value = "/sql/users/init_one_login_regular_user.sql")
+@Sql(value = "/sql/users/clean_users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) //SQL Injection to clean all data after the method;
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE) // It's needed for merging the @sql in class-level and method-level (by default, the method-level override the class-level)
 class ProfileControllerIT extends IntegrationTestConfig {
     private static final String URL = "/v1/profiles";
 

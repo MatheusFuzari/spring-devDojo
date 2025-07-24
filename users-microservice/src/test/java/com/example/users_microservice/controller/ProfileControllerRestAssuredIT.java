@@ -2,8 +2,10 @@ package com.example.users_microservice.controller;
 
 import com.example.users_microservice.common.FileUtils;
 import com.example.users_microservice.config.IntegrationTestConfig;
+import com.example.users_microservice.config.RestAssuredConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import net.javacrumbs.jsonunit.assertj.JsonAssertions;
 import net.javacrumbs.jsonunit.core.Option;
 import org.hamcrest.Matchers;
@@ -12,16 +14,21 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 
 import java.util.stream.Stream;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = RestAssuredConfig.class)
 //Integration test inits tomcat in a random port
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Sql(value = "/sql/users/init_one_login_regular_user.sql")
+@Sql(value = "/sql/users/clean_users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) //SQL Injection to clean all data after the method;
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE) // It's needed for merging the @sql in class-level and method-level (by default, the method-level override the class-level)
 class ProfileControllerRestAssuredIT extends IntegrationTestConfig {
     private static final String URL = "/v1/profiles";
 
@@ -30,10 +37,13 @@ class ProfileControllerRestAssuredIT extends IntegrationTestConfig {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    @Qualifier(value = "requestSpecificationRegularUser")
+    private RequestSpecification requestSpecificationRegularUser;
+
     @BeforeEach
     void setUrl() {
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = port;
+        RestAssured.requestSpecification = requestSpecificationRegularUser;
     }
 
     @Test
