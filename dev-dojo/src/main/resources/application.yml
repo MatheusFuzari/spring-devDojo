@@ -18,6 +18,7 @@ spring:
 logging:
   level:
     com.example.dev_dojo: debug
+    org.springframework.security: DEBUG
 
 springdoc:
   swagger-ui:

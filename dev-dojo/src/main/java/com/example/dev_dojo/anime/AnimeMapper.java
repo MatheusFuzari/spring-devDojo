@@ -1,9 +1,14 @@
 package com.example.dev_dojo.anime;
 
+import com.dev_dojo.dto.AnimeGetResponse;
+import com.dev_dojo.dto.AnimePostRequest;
+import com.dev_dojo.dto.AnimePutRequest;
+import com.dev_dojo.dto.PageAnime;
 import com.example.dev_dojo.domain.Anime;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -19,5 +24,9 @@ public interface AnimeMapper {
 
     AnimeGetResponse toAnimeGetResponse(Anime anime);
 
+
+
     List<AnimeGetResponse> toAnimeGetResponseList(List<Anime> animeList);
+
+    PageAnime toPageAnimeGetResponse(Page<Anime> animePaginated);
 }

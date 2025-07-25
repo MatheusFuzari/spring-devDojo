@@ -2,6 +2,7 @@ package com.example.dev_dojo.producer;
 
 
 import com.example.dev_dojo.domain.Producer;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("v1/producers")
 @Slf4j
 @RequiredArgsConstructor
+@SecurityRequirement(name = "basicAuth")
 public class ProducerController {
 
     private final ProducerMapper MAPPER;
@@ -37,7 +39,7 @@ public class ProducerController {
 //    }
 
     @GetMapping()
-    public ResponseEntity<List<ProducerGetResponse>> producersList(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<ProducerGetResponse>> findAllProducers(@RequestParam(required = false) String name) {
 
         var producers = producerService.findAll(name);
         var producerResponse = MAPPER.toProducerGetResponseList(producers);
@@ -47,7 +49,7 @@ public class ProducerController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<ProducerGetResponse> producerById(@PathVariable Long id){
+    public ResponseEntity<ProducerGetResponse> findProducerById(@PathVariable Long id){
 
         var producer = producerService.findById(id);
         var producerGetResponse = MAPPER.toProducerGetResponse(producer);

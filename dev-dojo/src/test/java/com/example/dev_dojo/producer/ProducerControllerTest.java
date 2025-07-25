@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -30,9 +31,10 @@ import java.util.stream.Stream;
 
 @WebMvcTest(controllers = ProducerController.class) //Sliced Test
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ComponentScan(basePackages = {"com.example.dev_dojo.producer", "com.example.dev_dojo.commons"})
+@ComponentScan(basePackages = {"com.example.dev_dojo.producer", "com.example.dev_dojo.commons", "com.example.dev_dojo.config"})
 @AutoConfigureMockMvc
 @Slf4j
+@WithMockUser
 //@ActiveProfiles("test")
 class ProducerControllerTest {
     private static final String URL = "/v1/producers";
@@ -65,8 +67,24 @@ class ProducerControllerTest {
 
         var response = fileUtils.readResourceFile("producer/get-producer-null-name-200.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().json(response));
+        mockMvc.perform(MockMvcRequestBuilders.get(URL).contentType(MediaType.APPLICATION_JSON_VALUE)).andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.content().json(response));
 
+    }
+
+    @Test
+    @DisplayName("GET v1/producers returns 403 when role is not user")
+    @Order(1)
+    @WithMockUser(roles = "ADMIN")
+    void findAll_Returns403_WhenRoleIsNotUser() throws Exception {
+        BDDMockito.when(repository.findAll()).thenReturn(producers);
+
+        var response = fileUtils.readResourceFile("producer/get-producer-null-name-200.json");
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(URL).contentType(MediaType.APPLICATION_JSON_VALUE)
+        )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -130,7 +148,7 @@ class ProducerControllerTest {
     @Order(6)
     void save_CreatesProducer_WhenSuccessful()  throws Exception{
         var request = fileUtils.readResourceFile("producer/post-request-producer-200.json");
-        var response = fileUtils.readResourceFile("producer/post-response-producer-201.json");
+        var expectedResponse = fileUtils.readResourceFile("producer/post-response-producer-201.json");
 
         var producerToSave = producerUtils.newProducerToSave();
 
@@ -138,7 +156,7 @@ class ProducerControllerTest {
 
         BDDMockito.when(repository.save(ArgumentMatchers.any())).thenReturn(producerToSave);
 
-        mockMvc.perform(MockMvcRequestBuilders
+        var response = mockMvc.perform(MockMvcRequestBuilders
                         .post(URL)
                         .content(request)
                         .header("x-api-kei", "123")
@@ -147,7 +165,7 @@ class ProducerControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().json(response));
+                .andExpect(MockMvcResultMatchers.content().json(expectedResponse));
     }
 
     @Test

@@ -1,7 +1,11 @@
 package com.example.dev_dojo.anime;
 
 
-import com.example.dev_dojo.domain.Anime;
+import com.dev_dojo.api.AnimeControllerApi;
+import com.dev_dojo.dto.AnimeGetResponse;
+import com.dev_dojo.dto.AnimePostRequest;
+import com.dev_dojo.dto.AnimePutRequest;
+import com.dev_dojo.dto.PageAnime;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -9,14 +13,13 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +32,14 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Tag(name = "1. Anime Controller")
-public class AnimeController {
+@SecurityRequirement(name = "basicAuth")
+public class AnimeController implements AnimeControllerApi {
 
     private final AnimeMapper MAPPER;
 
     private final AnimeService service;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "Get all Animes",
             description = "Get all animes available in system",
@@ -55,7 +59,7 @@ public class AnimeController {
                     )
             }
     )
-    public ResponseEntity<List<AnimeGetResponse>> animesList(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<AnimeGetResponse>> findAllAnimes(@RequestParam(required = false) String name) {
         log.debug("End-point to all animes, with param {}", name);
 
         var animes = service.findAll(name);
@@ -64,6 +68,7 @@ public class AnimeController {
         return ResponseEntity.status(HttpStatus.OK).body(animeGetResponseList);
     }
 
+    @Override
     @GetMapping(value = "/paginated", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "Get all animes paged",
@@ -76,14 +81,15 @@ public class AnimeController {
                     )
             }
     )
-    public ResponseEntity<Page<Anime>> animesPaged(@ParameterObject @PageableDefault(size = 20, page = 0) Pageable page) {
+    public ResponseEntity<PageAnime> findAllAnimesPaged(@ParameterObject final Pageable pageable) {
+        var animePaginated = service.findAllPaginated(pageable);
+        var pagedAnime = MAPPER.toPageAnimeGetResponse(animePaginated);
 
-        var animePaginated = service.findAllPaginated(page);
-        return ResponseEntity.status(HttpStatus.OK).body(animePaginated);
+        return ResponseEntity.status(HttpStatus.OK).body(pagedAnime);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<AnimeGetResponse> animeById(@PathVariable Long id) {
+    public ResponseEntity<AnimeGetResponse> findAnimeById(@PathVariable Long id) {
         var anime = service.findById(id);
         var response = MAPPER.toAnimeGetResponse(anime);
 

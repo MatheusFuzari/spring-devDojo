@@ -13,26 +13,33 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 
 @WebMvcTest(controllers = AnimeController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ComponentScan(basePackages = {"com.example.dev_dojo.anime", "com.example.dev_dojo.commons"})
+@ComponentScan(basePackages = {"com.example.dev_dojo.anime", "com.example.dev_dojo.commons", "com.example.dev_dojo.config"})
+@AutoConfigureMockMvc
 @Slf4j
+@WithMockUser
 class AnimeControllerTest {
     private static final String URL = "/v1/animes";
 
@@ -66,10 +73,24 @@ class AnimeControllerTest {
 
         var response = fileUtils.readResourceFile("/animes/get-animes-null-name-200.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL).contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(response));
+    }
+
+    @Test
+    @DisplayName("GET v1/animes findAll should 403 when role is not user")
+    @Order(1)
+    @WithMockUser(roles = {"ADMIN"})
+    void findAll_Return403_WhenRoleIsNotUser() throws Exception{
+        BDDMockito.when(repository.findAll()).thenReturn(animeList);
+
+        var response = fileUtils.readResourceFile("/animes/get-animes-null-name-200.json");
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URL).contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
@@ -84,7 +105,7 @@ class AnimeControllerTest {
         BDDMockito.when(repository.findAll(BDDMockito.any(Pageable.class))).thenReturn(animePaged);
 
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/paginated"))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL + "/paginated").contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(response));
@@ -99,7 +120,7 @@ class AnimeControllerTest {
 
         var response = fileUtils.readResourceFile("/animes/get-animes-x-name-200.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL).param("name","Shingeki"))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL).param("name","Shingeki").contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(response));
@@ -114,7 +135,7 @@ class AnimeControllerTest {
 
         var response = fileUtils.readResourceFile("/animes/get-animes-berserk-name-200.json");
 
-        mockMvc.perform(MockMvcRequestBuilders.get(URL).param("name",name))
+        mockMvc.perform(MockMvcRequestBuilders.get(URL).param("name",name).contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(response));
@@ -155,6 +176,7 @@ class AnimeControllerTest {
     @Test
     @DisplayName("POST v1/animes save creates an anime")
     @Order(6)
+    @WithMockUser
     void save_CreateAnime_WhenSuccessful() throws Exception{
         var request = fileUtils.readResourceFile("/animes/post-request-anime-200.json");
         var response = fileUtils.readResourceFile("/animes/post-response-anime-201.json");
@@ -167,10 +189,9 @@ class AnimeControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL)
                         .content(request)
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                 )
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().json(response));
     }

@@ -47,7 +47,7 @@ public class UserController {
                         content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = GetUserResponseDTO.class)))
                 )
     })
-    public ResponseEntity<List<GetUserResponseDTO>> getUsers(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<GetUserResponseDTO>> getAllUsers(@RequestParam(required = false) String name) {
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.toUserGetResponseList(service.findAll(name)));
     }
 
