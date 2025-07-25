@@ -1,5 +1,6 @@
 package com.example.dev_dojo.config;
 
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -48,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers(WHITE_LIST).permitAll()
                         .requestMatchers("v1/animes/**").hasRole("USER")
                         .requestMatchers("v1/producers/**").hasRole("USER")
+                        .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(Customizer.withDefaults())

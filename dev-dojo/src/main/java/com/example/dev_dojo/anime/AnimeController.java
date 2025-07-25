@@ -1,11 +1,11 @@
 package com.example.dev_dojo.anime;
 
-
 import com.dev_dojo.api.AnimeControllerApi;
 import com.dev_dojo.dto.AnimeGetResponse;
 import com.dev_dojo.dto.AnimePostRequest;
 import com.dev_dojo.dto.AnimePutRequest;
 import com.dev_dojo.dto.PageAnime;
+import com.example.dev_dojo.domain.Anime;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -31,7 +31,6 @@ import java.util.List;
 @RequestMapping("v1/animes")
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "1. Anime Controller")
 @SecurityRequirement(name = "basicAuth")
 public class AnimeController implements AnimeControllerApi {
 
@@ -39,26 +38,6 @@ public class AnimeController implements AnimeControllerApi {
 
     private final AnimeService service;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            summary = "Get all Animes",
-            description = "Get all animes available in system",
-            parameters = {
-                    @Parameter(
-                            in = ParameterIn.PATH,
-                            description = "Anime name",
-                            name = "name",
-                            example = "Jujutsu Kaisen"
-                    )
-            },
-            responses = {
-                    @ApiResponse(
-                            description = "List of all animes",
-                            responseCode = "200",
-                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = AnimeGetResponse.class)))
-                    )
-            }
-    )
     public ResponseEntity<List<AnimeGetResponse>> findAllAnimes(@RequestParam(required = false) String name) {
         log.debug("End-point to all animes, with param {}", name);
 
@@ -108,7 +87,6 @@ public class AnimeController implements AnimeControllerApi {
 
     @PutMapping()
     public ResponseEntity<Void> updateAnime(@RequestBody @Valid AnimePutRequest putRequest) {
-        log.debug("Update anime {}", putRequest);
 
         var animeToUpdate = MAPPER.toAnime(putRequest);
         service.update(animeToUpdate);

@@ -35,6 +35,13 @@ server:
     threads:
       max: 20
 
+management:
+  server:
+    port: 8989
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 #database:
 #  url: ${DB_URL:localhost}:${DB_PORT:3306}

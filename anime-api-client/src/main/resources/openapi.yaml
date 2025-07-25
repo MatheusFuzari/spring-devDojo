@@ -244,9 +244,11 @@ components:
         id:
           type: integer
           format: int64
+          x-field-extra-annotation: "@jakarta.validation.constraints.NotNull(message=\"The field 'id' cannot be null\")"
         name:
           type: string
           minLength: 1
+          x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank(message=\"The field 'name' is required\")"
       required:
         - id
         - name
@@ -270,6 +272,7 @@ components:
         name:
           type: string
           minLength: 1
+          x-field-extra-annotation: "@jakarta.validation.constraints.NotBlank(message=\"The field 'name' is required\")"
       required:
         - name
     ProducerGetResponse:

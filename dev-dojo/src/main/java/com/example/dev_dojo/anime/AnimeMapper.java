@@ -24,8 +24,6 @@ public interface AnimeMapper {
 
     AnimeGetResponse toAnimeGetResponse(Anime anime);
 
-
-
     List<AnimeGetResponse> toAnimeGetResponseList(List<Anime> animeList);
 
     PageAnime toPageAnimeGetResponse(Page<Anime> animePaginated);

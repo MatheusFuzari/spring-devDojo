@@ -1,12 +1,15 @@
 package com.example.dev_dojo.producer;
 
 
+import com.dev_dojo.api.ProducerControllerApi;
+import com.dev_dojo.dto.ProducerGetResponse;
+import com.dev_dojo.dto.ProducerPostRequest;
+import com.dev_dojo.dto.ProducerPutRequest;
 import com.example.dev_dojo.domain.Producer;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +21,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @SecurityRequirement(name = "basicAuth")
-public class ProducerController {
+public class ProducerController implements ProducerControllerApi {
 
     private final ProducerMapper MAPPER;
 
@@ -57,13 +60,9 @@ public class ProducerController {
         return ResponseEntity.status(HttpStatus.OK).body(producerGetResponse);
     }
 
-    // Produces -> O que este endpoint está gerando? (Content-Type)
-    // Consumes -> O que este endpoint consome? (Content-type dos Headers)
-    // Headers  -> Adiciona os headers necessários para a requisição, na Annotation é obrigatório, no argumento seleciona todos os headers enviados.
-    //produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "x-api-key"
-    @PostMapping()
-    public ResponseEntity<ProducerGetResponse> createProducer(@RequestBody @Valid ProducerPostRequest producerPostRequest, @RequestHeader HttpHeaders headers) {
-
+    @Override
+    @PostMapping
+    public ResponseEntity<ProducerGetResponse> createProducer(ProducerPostRequest producerPostRequest) {
         log.debug("Requesto to POST producer"+ producerPostRequest);
 
         Producer producer = MAPPER.toProducer(producerPostRequest);
@@ -72,7 +71,6 @@ public class ProducerController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(MAPPER.toProducerGetResponse(producer));
     }
-
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteProducerById(@PathVariable Long id) {
@@ -83,7 +81,7 @@ public class ProducerController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping()
+    @PutMapping
     public ResponseEntity<Void> updateProducer(@RequestBody @Valid ProducerPutRequest putRequest) {
         log.debug("Update producer {}", putRequest);
 
