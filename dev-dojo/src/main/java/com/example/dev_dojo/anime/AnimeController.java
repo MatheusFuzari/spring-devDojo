@@ -5,16 +5,9 @@ import com.dev_dojo.dto.AnimeGetResponse;
 import com.dev_dojo.dto.AnimePostRequest;
 import com.dev_dojo.dto.AnimePutRequest;
 import com.dev_dojo.dto.PageAnime;
-import com.example.dev_dojo.domain.Anime;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +31,8 @@ public class AnimeController implements AnimeControllerApi {
 
     private final AnimeService service;
 
+    @Override
+    @GetMapping
     public ResponseEntity<List<AnimeGetResponse>> findAllAnimes(@RequestParam(required = false) String name) {
         log.debug("End-point to all animes, with param {}", name);
 
