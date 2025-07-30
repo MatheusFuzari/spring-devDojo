@@ -1,3 +1,7 @@
+x-database-variables: &database-variables
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_dojo?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+  ENV_ROOT_USER: root
+  ENV_ROOT_PASSWORD: root
 services:
   mysql:
     image: mysql:9.0.1
@@ -9,6 +13,15 @@ services:
       - "3306:3306"
     volumes:
       - devdojo-db:/var/lib/mysql
+
+  dev-dojo:
+    image: matheusfuzari/dev-dojo:0.0.1-SNAPSHOT
+    container_name: dev-dojo
+    ports:
+      - "8090:8090"
+      - "8989:8989"
+    environment:
+      <<: *database-variables
 
   prometheus:
     image: prom/prometheus:v3.5.0
