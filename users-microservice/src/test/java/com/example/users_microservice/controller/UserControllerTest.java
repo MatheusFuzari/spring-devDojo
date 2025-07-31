@@ -1,6 +1,7 @@
 package com.example.users_microservice.controller;
 
 import com.example.users_microservice.common.FileUtils;
+import com.example.users_microservice.config.BrasilApiConfigurationProperties;
 import com.example.users_microservice.domain.User;
 import com.example.users_microservice.repository.ProfileRepository;
 import com.example.users_microservice.repository.UserProfileRepository;
@@ -36,6 +37,10 @@ import java.util.stream.Stream;
 @WithMockUser
 class UserControllerTest {
     private static final String URL = "/v1/users";
+
+    @MockitoBean
+    private BrasilApiConfigurationProperties brasilApiConfigurationProperties;
+
 
     @Autowired
     private MockMvc mockMvc;

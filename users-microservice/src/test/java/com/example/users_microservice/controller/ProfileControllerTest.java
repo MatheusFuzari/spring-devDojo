@@ -2,6 +2,7 @@ package com.example.users_microservice.controller;
 
 import com.example.users_microservice.common.FileUtils;
 import com.example.users_microservice.common.ProfileUtils;
+import com.example.users_microservice.config.BrasilApiConfigurationProperties;
 import com.example.users_microservice.domain.Profile;
 import com.example.users_microservice.repository.ProfileRepository;
 import com.example.users_microservice.repository.UserProfileRepository;
@@ -30,6 +31,9 @@ class ProfileControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private BrasilApiConfigurationProperties brasilApiConfigurationProperties;
 
     @MockitoBean
     private ProfileRepository repository;
