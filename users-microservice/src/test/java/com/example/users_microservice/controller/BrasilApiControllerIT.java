@@ -3,7 +3,6 @@ package com.example.users_microservice.controller;
 import com.example.users_microservice.common.FileUtils;
 import com.example.users_microservice.config.IntegrationTestConfig;
 import com.example.users_microservice.config.RestAssuredConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -11,7 +10,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpStatus;
@@ -42,7 +40,7 @@ public class BrasilApiControllerIT extends IntegrationTestConfig {
     @Test
     @Order(1)
     @DisplayName("findCep return CepGetResponse when successful")
-    void findCep_ReturnsCepGetResponse_WhenSuccessful() throws JsonProcessingException {
+    void findCep_ReturnsCepGetResponse_WhenSuccessful() {
         var cep = "00000000";
         var expectedResponse = fileUtils.readResourceFile("/brasil-api/cep/expected-get-cep-response-200.json");
 
@@ -50,9 +48,27 @@ public class BrasilApiControllerIT extends IntegrationTestConfig {
         RestAssured.given()
                 .contentType(ContentType.JSON).accept(ContentType.JSON)
                 .when()
-                .get(URL)
+                .get(URL + "/cep/{cep}", cep)
                 .then()
                 .statusCode(HttpStatus.OK.value())
+                .body(Matchers.equalTo(expectedResponse))
+                .log().all();
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("findCep return CepErrorResponse when unsuccessful")
+    void findCep_ReturnsCepErrorResponse_WhenUnsuccessful() {
+        var cep = "40400000";
+        var expectedResponse = fileUtils.readResourceFile("/brasil-api/cep/expected-get-cep-response-404.json");
+
+
+        RestAssured.given()
+                .contentType(ContentType.JSON).accept(ContentType.JSON)
+                .when()
+                .get(URL + "/cep/{cep}", cep)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body(Matchers.equalTo(expectedResponse))
                 .log().all();
     }

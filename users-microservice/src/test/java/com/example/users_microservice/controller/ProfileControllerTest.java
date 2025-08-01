@@ -11,6 +11,7 @@ import com.example.users_microservice.services.ProfileService;
 import org.junit.jupiter.api.*;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -26,14 +27,12 @@ import java.util.List;
 @WebMvcTest(controllers = ProfileController.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ComponentScan(basePackages = {"com.example"})
+@EnableConfigurationProperties(value = BrasilApiConfigurationProperties.class)
 @WithMockUser
 class ProfileControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockitoBean
-    private BrasilApiConfigurationProperties brasilApiConfigurationProperties;
 
     @MockitoBean
     private ProfileRepository repository;

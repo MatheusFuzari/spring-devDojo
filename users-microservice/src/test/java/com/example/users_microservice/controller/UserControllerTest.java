@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -34,13 +35,10 @@ import java.util.stream.Stream;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //{User.class, UserRepository.class, UserController.class, UserService.class, FileUtils.class}
 @ComponentScan(basePackages = {"com.example"})
+@EnableConfigurationProperties(value = BrasilApiConfigurationProperties.class)
 @WithMockUser
 class UserControllerTest {
     private static final String URL = "/v1/users";
-
-    @MockitoBean
-    private BrasilApiConfigurationProperties brasilApiConfigurationProperties;
-
 
     @Autowired
     private MockMvc mockMvc;
