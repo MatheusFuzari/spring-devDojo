@@ -1,4 +1,4 @@
-{
+ {
   "request": {
     "method": "GET",
     "url": "/api/cep/v1/40400000"
@@ -11,4 +11,4 @@
       "Content-Type": "application/json"
     }
   }
-}
+}f

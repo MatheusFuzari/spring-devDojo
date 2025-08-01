@@ -8,13 +8,20 @@ import com.dev_dojo.dto.ProducerPutRequest;
 import com.example.dev_dojo.domain.Producer;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("v1/producers")
@@ -23,72 +30,72 @@ import java.util.List;
 @SecurityRequirement(name = "basicAuth")
 public class ProducerController implements ProducerControllerApi {
 
-    private final ProducerMapper MAPPER;
+  private final ProducerMapper MAPPER;
 
-    private final ProducerService producerService;
+  private final ProducerService producerService;
 
 
 
-    /*
-    * Pq passar o Autowired no construtor, não na variavel?
-    * 1° Imutabilidade
-    * 2° Testes
-    * 3° Single responsability
-    *
-    * */
+  /*
+   * Pq passar o Autowired no construtor, não na variavel?
+   * 1° Imutabilidade
+   * 2° Testes
+   * 3° Single responsability
+   *
+   * */
 //    @Autowired
 //    public ProducerController(ProducerService service) {
 //        this.producerService = service;
 //    }
 
-    @GetMapping()
-    public ResponseEntity<List<ProducerGetResponse>> findAllProducers(@RequestParam(required = false) String name) {
+  @GetMapping()
+  public ResponseEntity<List<ProducerGetResponse>> findAllProducers(@RequestParam(required = false) String name) {
 
-        var producers = producerService.findAll(name);
-        var producerResponse = MAPPER.toProducerGetResponseList(producers);
+    var producers = producerService.findAll(name);
+    var producerResponse = MAPPER.toProducerGetResponseList(producers);
 
-        return ResponseEntity.status(HttpStatus.OK).body(producerResponse);
+    return ResponseEntity.status(HttpStatus.OK).body(producerResponse);
 
-    }
+  }
 
-    @GetMapping("{id}")
-    public ResponseEntity<ProducerGetResponse> findProducerById(@PathVariable Long id){
+  @GetMapping("{id}")
+  public ResponseEntity<ProducerGetResponse> findProducerById(@PathVariable Long id) {
 
-        var producer = producerService.findById(id);
-        var producerGetResponse = MAPPER.toProducerGetResponse(producer);
+    var producer = producerService.findById(id);
+    var producerGetResponse = MAPPER.toProducerGetResponse(producer);
 
-        return ResponseEntity.status(HttpStatus.OK).body(producerGetResponse);
-    }
+    return ResponseEntity.status(HttpStatus.OK).body(producerGetResponse);
+  }
 
-    @Override
-    @PostMapping
-    public ResponseEntity<ProducerGetResponse> createProducer(ProducerPostRequest producerPostRequest) {
-        log.debug("Requesto to POST producer"+ producerPostRequest);
+  @Override
+  @PostMapping
+  public ResponseEntity<ProducerGetResponse> createProducer(ProducerPostRequest producerPostRequest) {
+    log.debug("Requesto to POST producer" + producerPostRequest);
 
-        Producer producer = MAPPER.toProducer(producerPostRequest);
+    Producer producer = MAPPER.toProducer(producerPostRequest);
 
-        producerService.save(producer);
+    producerService.save(producer);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(MAPPER.toProducerGetResponse(producer));
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(MAPPER.toProducerGetResponse(producer));
+  }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteProducerById(@PathVariable Long id) {
-        log.debug("Deleting producer by id {}", id);
+  @DeleteMapping("{id}")
+  public ResponseEntity<Void> deleteProducerById(@PathVariable Long id) {
+    log.debug("Deleting producer by id {}", id);
 
-        producerService.delete(id);
+    producerService.delete(id);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 
-    @PutMapping
-    public ResponseEntity<Void> updateProducer(@RequestBody @Valid ProducerPutRequest putRequest) {
-        log.debug("Update producer {}", putRequest);
+  @PutMapping
+  public ResponseEntity<Void> updateProducer(@RequestBody @Valid ProducerPutRequest putRequest) {
+    log.debug("Update producer {}", putRequest);
 
-        var producerUpdated = MAPPER.toProducer(putRequest);
+    var producerUpdated = MAPPER.toProducer(putRequest);
 
-        producerService.update(producerUpdated);
+    producerService.update(producerUpdated);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 }

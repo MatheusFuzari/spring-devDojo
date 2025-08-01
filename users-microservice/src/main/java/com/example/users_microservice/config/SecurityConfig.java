@@ -17,25 +17,25 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final String[] WHITE_LIST = {"/swagger-ui.html", "/v3/**", "/swagger-ui/**", "/csrf"};
+  private static final String[] WHITE_LIST = {"/swagger-ui.html", "/v3/**", "/swagger-ui/**", "/csrf"};
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // CSRF
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    // CSRF
+    return http
+        .csrf(AbstractHttpConfigurer::disable)
 //                .csrf(csrf ->
 //                        csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 //                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
 //                )
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(WHITE_LIST).permitAll()
-                        .requestMatchers(HttpMethod.POST,"/v1/users").permitAll()
-                        .requestMatchers(HttpMethod.DELETE,"/v1/users/*").hasAuthority("ADMIN")
-                        .anyRequest().authenticated()
-                )
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(WHITE_LIST).permitAll()
+            .requestMatchers(HttpMethod.POST, "/v1/users").permitAll()
+            .requestMatchers(HttpMethod.DELETE, "/v1/users/*").hasAuthority("ADMIN")
+            .anyRequest().authenticated()
+        )
         .httpBasic(Customizer.withDefaults())
         .build();
-    }
+  }
 
 }

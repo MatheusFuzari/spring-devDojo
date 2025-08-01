@@ -7,7 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class CustomNotFoundException extends ResponseStatusException {
 
-    public CustomNotFoundException(String message) {
-        super(HttpStatus.NOT_FOUND, message);
-    }
+  public CustomNotFoundException(String message) {
+    super(HttpStatus.NOT_FOUND, message);
+  }
 }

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -16,9 +17,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("v1/animes")
@@ -27,76 +34,76 @@ import java.util.List;
 @SecurityRequirement(name = "basicAuth")
 public class AnimeController implements AnimeControllerApi {
 
-    private final AnimeMapper MAPPER;
+  private final AnimeMapper MAPPER;
 
-    private final AnimeService service;
+  private final AnimeService service;
 
-    @Override
-    @GetMapping
-    public ResponseEntity<List<AnimeGetResponse>> findAllAnimes(@RequestParam(required = false) String name) {
-        log.debug("End-point to all animes, with param {}", name);
+  @Override
+  @GetMapping
+  public ResponseEntity<List<AnimeGetResponse>> findAllAnimes(@RequestParam(required = false) String name) {
+    log.debug("End-point to all animes, with param {}", name);
 
-        var animes = service.findAll(name);
-        List<AnimeGetResponse> animeGetResponseList = MAPPER.toAnimeGetResponseList(animes);
+    var animes = service.findAll(name);
+    List<AnimeGetResponse> animeGetResponseList = MAPPER.toAnimeGetResponseList(animes);
 
-        return ResponseEntity.status(HttpStatus.OK).body(animeGetResponseList);
-    }
+    return ResponseEntity.status(HttpStatus.OK).body(animeGetResponseList);
+  }
 
-    @Override
-    @GetMapping(value = "/paginated", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-            summary = "Get all animes paged",
-            description = "Get animes by page, size and/or sort",
-            responses = {
-                    @ApiResponse(
-                            description = "Get animes paged",
-                            responseCode = "200",
-                            useReturnTypeSchema = true //Get the method return type.
-                    )
-            }
-    )
-    public ResponseEntity<PageAnime> findAllAnimesPaged(@ParameterObject final Pageable pageable) {
-        var animePaginated = service.findAllPaginated(pageable);
-        var pagedAnime = MAPPER.toPageAnimeGetResponse(animePaginated);
+  @Override
+  @GetMapping(value = "/paginated", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(
+      summary = "Get all animes paged",
+      description = "Get animes by page, size and/or sort",
+      responses = {
+          @ApiResponse(
+              description = "Get animes paged",
+              responseCode = "200",
+              useReturnTypeSchema = true //Get the method return type.
+          )
+      }
+  )
+  public ResponseEntity<PageAnime> findAllAnimesPaged(@ParameterObject final Pageable pageable) {
+    var animePaginated = service.findAllPaginated(pageable);
+    var pagedAnime = MAPPER.toPageAnimeGetResponse(animePaginated);
 
-        return ResponseEntity.status(HttpStatus.OK).body(pagedAnime);
-    }
+    return ResponseEntity.status(HttpStatus.OK).body(pagedAnime);
+  }
 
-    @GetMapping("{id}")
-    public ResponseEntity<AnimeGetResponse> findAnimeById(@PathVariable Long id) {
-        var anime = service.findById(id);
-        var response = MAPPER.toAnimeGetResponse(anime);
+  @GetMapping("{id}")
+  public ResponseEntity<AnimeGetResponse> findAnimeById(@PathVariable Long id) {
+    var anime = service.findById(id);
+    var response = MAPPER.toAnimeGetResponse(anime);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
 
-    @PostMapping()
-    public ResponseEntity<AnimeGetResponse> createAnime(@RequestBody @Valid AnimePostRequest request) {
-        log.debug("End-point for saving animes {}", request);
+  @PostMapping()
+  public ResponseEntity<AnimeGetResponse> createAnime(@RequestBody @Valid AnimePostRequest request) {
+    log.debug("End-point for saving animes {}", request);
 
-        var anime = MAPPER.toAnime(request);
-        service.save(anime);
+    var anime = MAPPER.toAnime(request);
+    service.save(anime);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(MAPPER.toAnimeGetResponse(anime));
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(MAPPER.toAnimeGetResponse(anime));
+  }
 
-    @PutMapping()
-    public ResponseEntity<Void> updateAnime(@RequestBody @Valid AnimePutRequest putRequest) {
+  @PutMapping()
+  public ResponseEntity<Void> updateAnime(@RequestBody @Valid AnimePutRequest putRequest) {
 
-        var animeToUpdate = MAPPER.toAnime(putRequest);
-        service.update(animeToUpdate);
+    var animeToUpdate = MAPPER.toAnime(putRequest);
+    service.update(animeToUpdate);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteAnimeById(@PathVariable Long id) {
-        log.debug("Deleting anime by id {}", id);
+  @DeleteMapping("{id}")
+  public ResponseEntity<Void> deleteAnimeById(@PathVariable Long id) {
+    log.debug("Deleting anime by id {}", id);
 
-        service.delete(id);
+    service.delete(id);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 
 
 }

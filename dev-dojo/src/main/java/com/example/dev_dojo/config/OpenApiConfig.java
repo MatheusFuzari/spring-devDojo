@@ -8,10 +8,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @SecurityScheme(
-        name = "basicAuth",
-        type = SecuritySchemeType.HTTP,
-        scheme = "basic"
+    name = "basicAuth",
+    type = SecuritySchemeType.HTTP,
+    scheme = "basic"
 )
 @OpenAPIDefinition(info = @Info(title = "Anime service OpenAPI"))
 public class OpenApiConfig {
+
 }

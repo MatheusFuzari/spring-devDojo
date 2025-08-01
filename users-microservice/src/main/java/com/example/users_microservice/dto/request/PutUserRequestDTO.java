@@ -14,21 +14,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PutUserRequestDTO {
-    @NotNull(message = "The field 'id' cannot be null")
-    @Schema(description = "User's id", example = "1")
-    private Long id;
 
-    @NotBlank(message = "The field 'firstName' is required")
-    @Schema(description = "User's first name", example = "Rin")
-    private String firstName; // null, "", " "
+  @NotNull(message = "The field 'id' cannot be null")
+  @Schema(description = "User's id", example = "1")
+  private Long id;
 
-    @NotBlank(message = "The field 'lastName' is required")
-    @Schema(description = "User's last name", example = "Itoshi")
-    private String lastName;
+  @NotBlank(message = "The field 'firstName' is required")
+  @Schema(description = "User's first name", example = "Rin")
+  private String firstName; // null, "", " "
 
-    @NotBlank(message = "The field 'email' is required")
-    @Email(message = "'email' is not valid", regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
-    @Schema(description = "User's e-mail. Must be unique", example = "rin.itoshi@frombluelock.com")
-    private String email;
-    private String password;
+  @NotBlank(message = "The field 'lastName' is required")
+  @Schema(description = "User's last name", example = "Itoshi")
+  private String lastName;
+
+  @NotBlank(message = "The field 'email' is required")
+  @Email(message = "'email' is not valid", regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+  @Schema(description = "User's e-mail. Must be unique", example = "rin.itoshi@frombluelock.com")
+  private String email;
+  private String password;
 }

@@ -1,6 +1,5 @@
 package com.example.users_microservice.controller;
 
-import com.example.users_microservice.config.BrasilApiConfigurationProperties;
 import com.example.users_microservice.dto.response.CepGetResponse;
 import com.example.users_microservice.services.BrasilApiService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,13 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "basicAuth")
 @Slf4j
 public class BrasilApiController {
-    private final BrasilApiService service;
 
-    @GetMapping("/cep/{cep}")
-    public ResponseEntity<CepGetResponse> brasilApi(@PathVariable String cep) {
-        log.info("request received to find cep");
-        var cepGetResponse = service.findCep(cep);
+  private final BrasilApiService service;
 
-        return ResponseEntity.ok(cepGetResponse);
-    }
+  @GetMapping("/cep/{cep}")
+  public ResponseEntity<CepGetResponse> brasilApi(@PathVariable String cep) {
+    log.info("request received to find cep");
+    var cepGetResponse = service.findCep(cep);
+
+    return ResponseEntity.ok(cepGetResponse);
+  }
 }

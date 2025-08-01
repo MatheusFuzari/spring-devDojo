@@ -29,6 +29,7 @@
 	</scm>
 	<properties>
 		<anime-api-client.version>1.0-SNAPSHOT</anime-api-client.version>
+
 	</properties>
 
 	<dependencies>
@@ -70,6 +71,17 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
+		</dependency>
+
 
 	</dependencies>
 </project>

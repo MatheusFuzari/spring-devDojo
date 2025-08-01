@@ -7,15 +7,18 @@ import com.example.users_microservice.mapper.ProfileMapper;
 import com.example.users_microservice.services.ProfileService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/profiles")
@@ -24,29 +27,29 @@ import java.util.List;
 @SecurityRequirement(name = "basicAuth")
 public class ProfileController {
 
-    private final ProfileService service;
+  private final ProfileService service;
 
-    private final ProfileMapper MAPPER = ProfileMapper.MAPPER;
+  private final ProfileMapper MAPPER = ProfileMapper.MAPPER;
 
-    @GetMapping
-    public ResponseEntity<List<GetProfileResponseDTO>> getAllProfiles() {
-        var profiles = MAPPER.toGetResponseList(service.getAllProfiles());
+  @GetMapping
+  public ResponseEntity<List<GetProfileResponseDTO>> getAllProfiles() {
+    var profiles = MAPPER.toGetResponseList(service.getAllProfiles());
 
-        return ResponseEntity.status(HttpStatus.OK).body(profiles);
-    }
+    return ResponseEntity.status(HttpStatus.OK).body(profiles);
+  }
 
-    @GetMapping("/paginated")
-    public ResponseEntity<Page<Profile>> getAllProfilesPaginated(Pageable page) {
-        var profilesPaginated = service.getAllProfilesPaginated(page);
+  @GetMapping("/paginated")
+  public ResponseEntity<Page<Profile>> getAllProfilesPaginated(Pageable page) {
+    var profilesPaginated = service.getAllProfilesPaginated(page);
 
-        return ResponseEntity.status(HttpStatus.OK).body(profilesPaginated);
-    }
+    return ResponseEntity.status(HttpStatus.OK).body(profilesPaginated);
+  }
 
-    @PostMapping()
-    public ResponseEntity<Profile> createProfile(@RequestBody @Valid PostProfileRequestDTO newProfile){
-        var profileToCreate = MAPPER.toProfile(newProfile);
-        var createdProfile = service.createProfile(profileToCreate);
+  @PostMapping()
+  public ResponseEntity<Profile> createProfile(@RequestBody @Valid PostProfileRequestDTO newProfile) {
+    var profileToCreate = MAPPER.toProfile(newProfile);
+    var createdProfile = service.createProfile(profileToCreate);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProfile);
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdProfile);
+  }
 }
