@@ -51,17 +51,9 @@ public class AnimeController implements AnimeControllerApi {
 
   @Override
   @GetMapping(value = "/paginated", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(
-      summary = "Get all animes paged",
-      description = "Get animes by page, size and/or sort",
-      responses = {
-          @ApiResponse(
-              description = "Get animes paged",
-              responseCode = "200",
-              useReturnTypeSchema = true //Get the method return type.
-          )
-      }
-  )
+  @Operation(summary = "Get all animes paged", description = "Get animes by page, size and/or sort", responses = {
+      @ApiResponse(description = "Get animes paged", responseCode = "200", useReturnTypeSchema = true //Get the method return type.
+      )})
   public ResponseEntity<PageAnime> findAllAnimesPaged(@ParameterObject final Pageable pageable) {
     var animePaginated = service.findAllPaginated(pageable);
     var pagedAnime = MAPPER.toPageAnimeGetResponse(animePaginated);

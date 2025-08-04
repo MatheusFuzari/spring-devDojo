@@ -1,2 +1,2 @@
-create table dev_dojo.anime (id bigint not null auto_increment, anime varchar(255), primary key (id));
-create table dev_dojo.producer (id bigint not null auto_increment, created_at datetime(6), name varchar(255), primary key (id));
+CREATE TABLE dev_dojo.anime (id bigint not null auto_increment, anime varchar(255), primary key (id));
+CREATE TABLE dev_dojo.producer (id bigint not null auto_increment, created_at datetime(6), name varchar(255), primary key (id));
